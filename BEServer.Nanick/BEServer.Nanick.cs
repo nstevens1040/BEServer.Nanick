@@ -15,8 +15,10 @@
     using MimeKit;
     using Execute;
     using System.Reflection;
+    using SQLite;
     public class HttpServer
     {
+        public Logger Logger = new Logger();
         public static byte[] ReadFully(Stream input)
         {
             using (MemoryStream ms = new MemoryStream())
@@ -105,32 +107,24 @@
                     return Assembly.Load(assemblyData);
                 }
             };
+            this.Logger.SQLiteConnect();
             //string computername = GetHostname();
             //string ipv4 = GetIPAddress();
             //string pubip = GetPubIP();
-            Environment.SetEnvironmentVariable("IP", "fd00::4:4ef");
-            Environment.SetEnvironmentVariable("PORT", "8100");
-            this.Listener = new HttpListener
+            //Environment.SetEnvironmentVariable("IP", "fd00::4:4ef");
+            //Environment.SetEnvironmentVariable("PORT", "8100");
+            this.Listener = new HttpListener()
             {
-                Prefixes = {
-                    $"http://localhost:{port}/"//,
-                    //$"https://{computername}:{port}/",
-                    //$"https://beserver.nanick.org:{port}/",
-                    //$"https://{ipv4}:{port}/",
-                    //$"https://{Environment.GetEnvironmentVariable("IP")}:{Environment.GetEnvironmentVariable("PORT")}",
-                    //$"https://{pubip}:{port}"
-                }
+                Prefixes = { "http://localhost:8110/" }
             };
         }
-        public static string GetRequestData(HttpListenerContext context)
+        public static async Task<string> GetRequestData(HttpListenerContext context)
         {
             string request_data = String.Empty;
-            Stream bod = Stream.Null;
-            bod = context.Request.InputStream;
-            if (bod != Stream.Null)
+            await Task.Factory.StartNew(() =>
             {
-                request_data = (new StreamReader(bod, context.Request.ContentEncoding)).ReadToEnd();
-            }
+                request_data = !context.Request.HasEntityBody ? String.Empty : (new StreamReader(context.Request.InputStream, context.Request.ContentEncoding)).ReadToEnd();
+            });
             return request_data;
         }
         public static async Task<string> php(HttpListenerContext context, string path_)
@@ -304,14 +298,15 @@
         }
         public async Task ProcessRequestAsync(HttpListenerContext context)
         {
-            string abs_path = context.Request.Url == null ? String.Empty : context.Request.Url.AbsolutePath;
+            this.Logger.SQLiteInsert(context);
+            string abs_path = context.Request.Url == null ? String.Empty : context.Request.Url.AbsolutePath.ToLower();
             string streambody = String.Empty;
             string source_ip = context.Request.RemoteEndPoint.Address.ToString();
             string method = context.Request.HttpMethod;
             NameValueCollection headers = context.Request.Headers;
             CookieCollection cookies = context.Request.Cookies;
             bool is_auth = context.Request.IsAuthenticated;
-            streambody = GetRequestData(context);
+            streambody = await GetRequestData(context);
             bool handled = await HandleFileRequest(context);
             if (!handled)
             {
