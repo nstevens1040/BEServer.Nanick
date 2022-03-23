@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
@@ -25,7 +25,6 @@
   <ItemGroup>
     <Reference Include="Execute.HttpRequest.Core">
       <HintPath>lib\Execute.HttpRequest.Core.dll</HintPath>
-      <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>lib\HtmlAgilityPack.dll</HintPath>
@@ -33,7 +32,6 @@
     </Reference>
     <Reference Include="MimeKit">
       <HintPath>lib\MimeKit.dll</HintPath>
-      <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
