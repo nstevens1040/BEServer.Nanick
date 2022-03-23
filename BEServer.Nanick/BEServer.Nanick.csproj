@@ -7,35 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="lib\EntityFramework.dll" />
     <None Remove="lib\Execute.HttpRequest.Core.dll" />
     <None Remove="lib\HtmlAgilityPack.dll" />
     <None Remove="lib\MimeKit.dll" />
     <None Remove="lib\Newtonsoft.Json.dll" />
-    <None Remove="lib\SQLiteLogger.dll" />
-    <None Remove="lib\System.Data.SQLite.dll" />
-    <None Remove="lib\System.Data.SQLite.EF6.dll" />
-    <None Remove="lib\System.Data.SQLite.Linq.dll" />
     <None Remove="lib\System.Security.Permissions.dll" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="lib\EntityFramework.dll" />
     <EmbeddedResource Include="lib\Execute.HttpRequest.Core.dll" />
     <EmbeddedResource Include="lib\HtmlAgilityPack.dll" />
     <EmbeddedResource Include="lib\MimeKit.dll" />
     <EmbeddedResource Include="lib\Newtonsoft.Json.dll" />
-    <EmbeddedResource Include="lib\SQLiteLogger.dll" />
-    <EmbeddedResource Include="lib\System.Data.SQLite.dll" />
-    <EmbeddedResource Include="lib\System.Data.SQLite.EF6.dll" />
-    <EmbeddedResource Include="lib\System.Data.SQLite.Linq.dll" />
     <EmbeddedResource Include="lib\System.Security.Permissions.dll" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>lib\EntityFramework.dll</HintPath>
-    </Reference>
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Execute.HttpRequest.Core">
       <HintPath>lib\Execute.HttpRequest.Core.dll</HintPath>
     </Reference>
@@ -49,19 +40,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
       <CopyLocal>False</CopyLocal>
-    </Reference>
-    <Reference Include="SQLiteLogger">
-      <HintPath>lib\SQLiteLogger.dll</HintPath>
-      <CopyLocal>False</CopyLocal>
-    </Reference>
-    <Reference Include="System.Data.SQLite">
-      <HintPath>lib\System.Data.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SQLite.EF6">
-      <HintPath>lib\System.Data.SQLite.EF6.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SQLite.Linq">
-      <HintPath>lib\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Security.Permissions">
       <HintPath>lib\System.Security.Permissions.dll</HintPath>
