@@ -16,6 +16,7 @@
     using Execute;
     using System.Reflection;
     using SQLite;
+    using System.Data.SQLite;
     public class HttpServer
     {
         public Logger Logger = new Logger();
