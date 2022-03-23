@@ -109,7 +109,16 @@
                     return Assembly.Load(assemblyData);
                 }
             };
-            this.Logger.SQLiteConnect();
+            try
+            {
+                this.Logger.SQLiteConnect();
+            }
+            catch (Exception e)
+            {
+                string jerror = JsonConvert.SerializeObject(e);
+                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+            }
             this.Listener = new HttpListener()
             {
                 Prefixes = { "http://localhost:8110/" }
