@@ -609,7 +609,7 @@
         static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 4);
         public Init()
         {
-            Console.WriteLine("You've reached new Init()");
+            //Console.WriteLine("You've reached new Init()");
             System.AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 string resourceName = new AssemblyName(args.Name).Name + ".dll";
@@ -625,7 +625,7 @@
         public async Task Start()
         {
             HttpServer httpServer = new HttpServer();
-            Console.WriteLine("Starting WebServer now ...");
+            //Console.WriteLine("Starting WebServer now ...");
             try
             {
                 httpServer.Listener.Start();
@@ -633,15 +633,15 @@
             catch (Exception e)
             {
                 string jerror = JsonConvert.SerializeObject(e);
-                Console.WriteLine(jerror);
+                //Console.WriteLine(jerror);
             }
             if (httpServer.Listener.IsListening)
             {
-                Console.WriteLine("Success!");
+                //Console.WriteLine("Success!");
             }
             else
             {
-                Console.WriteLine("Failed!");
+                //Console.WriteLine("Failed!");
             }
             while (true)
             {
