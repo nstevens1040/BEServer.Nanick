@@ -95,6 +95,7 @@
         }
         private const int port = 8110;
         public HttpListener Listener;
+        public static string home_ = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("HOME")) ? Environment.GetEnvironmentVariable("USERPROFILE") : Environment.GetEnvironmentVariable("HOME");
         public HttpServer()
         {
             System.AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
@@ -109,11 +110,6 @@
                 }
             };
             this.Logger.SQLiteConnect();
-            //string computername = GetHostname();
-            //string ipv4 = GetIPAddress();
-            //string pubip = GetPubIP();
-            //Environment.SetEnvironmentVariable("IP", "fd00::4:4ef");
-            //Environment.SetEnvironmentVariable("PORT", "8100");
             this.Listener = new HttpListener()
             {
                 Prefixes = { "http://localhost:8110/" }
@@ -173,7 +169,7 @@
         {
             bool handled = false;
             string abs_path = context.Request.Url == null ? String.Empty : context.Request.Url.AbsolutePath;
-            string RequestFile = $"{Environment.GetEnvironmentVariable("HOME")}/.TEMP/VAR/www" + Uri.UnescapeDataString(abs_path);
+            string RequestFile = $"{home_}/.TEMP/VAR/www" + Uri.UnescapeDataString(abs_path);
             if (File.Exists(RequestFile) & !abs_path.ToLower().Equals("/pixel.gif") & !abs_path.ToLower().Equals("/ebay.gif"))
             {
                 if (MimeTypes.GetMimeType(RequestFile).Contains("video") | MimeTypes.GetMimeType(RequestFile).Contains("mpegURL"))
@@ -348,8 +344,8 @@
                 catch (Exception e)
                 {
                     string jerror = JsonConvert.SerializeObject(e);
-                    File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                    File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
                     byte[] htmlIndex = Encoding.UTF8.GetBytes(jerror);
                     context.Response.ContentEncoding = Encoding.UTF8;
                     context.Response.ContentType = "application/json";
@@ -433,8 +429,8 @@
                         catch (Exception e)
                         {
                             string jerror = JsonConvert.SerializeObject(e);
-                            File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                            File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", jerror + (Char)10);
+                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
                             byte[] htmlIndex = Encoding.UTF8.GetBytes(jerror);
                             context.Response.ContentEncoding = Encoding.UTF8;
                             context.Response.ContentType = "application/json";
@@ -550,8 +546,8 @@
                         catch (Exception e)
                         {
                             string jerror = JsonConvert.SerializeObject(e);
-                            File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                            File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", jerror + (Char)10);
+                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
                         }
                     }
                 }
@@ -600,13 +596,15 @@
     }
     public class Init
     {
+        public static string home_ = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("HOME")) ? Environment.GetEnvironmentVariable("USERPROFILE") : Environment.GetEnvironmentVariable("HOME");
         static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 4);
-        public static async Task Start()
+        public Init()
         {
+            Console.WriteLine("You've reached new Init()");
             System.AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 string resourceName = new AssemblyName(args.Name).Name + ".dll";
-                string resource = Array.Find(typeof(Init).Assembly.GetManifestResourceNames(), element => element.EndsWith(resourceName));
+                string resource = Array.Find(this.GetType().Assembly.GetManifestResourceNames(), element => element.EndsWith(resourceName));
                 using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource))
                 {
                     Byte[] assemblyData = new Byte[stream.Length];
@@ -614,6 +612,9 @@
                     return Assembly.Load(assemblyData);
                 }
             };
+        }
+        public async Task Start()
+        {
             HttpServer httpServer = new HttpServer();
             Console.WriteLine("Starting WebServer now ...");
             try
@@ -624,8 +625,6 @@
             {
                 string jerror = JsonConvert.SerializeObject(e);
                 Console.WriteLine(jerror);
-                //File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", DateTime.Now.ToStr>
-                //File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", jerror + (Char)10);
             }
             if (httpServer.Listener.IsListening)
             {
@@ -646,8 +645,8 @@
                 catch (Exception e)
                 {
                     string jerror = JsonConvert.SerializeObject(e);
-                    File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                    File.AppendAllText($"{Environment.GetEnvironmentVariable("HOME")}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
                     if (e is HttpListenerException) return;
                 }
                 finally
@@ -659,23 +658,10 @@
     }
     public class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
-            System.AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-            {
-                string resourceName = new AssemblyName(args.Name).Name + ".dll";
-                string resource = Array.Find(typeof(Program).Assembly.GetManifestResourceNames(), element => element.EndsWith(resourceName));
-                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource))
-                {
-                    Byte[] assemblyData = new Byte[stream.Length];
-                    stream.Read(assemblyData, 0, assemblyData.Length);
-                    return Assembly.Load(assemblyData);
-                }
-            };
-            Task.Factory.StartNew(async () =>
-            {
-                await Init.Start();
-            });
+            Init init = new Init();
+            await init.Start();
         }
     }
     public class GeoJson
