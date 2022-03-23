@@ -83,7 +83,7 @@
         public static string home_ = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("HOME")) ? Environment.GetEnvironmentVariable("USERPROFILE") : Environment.GetEnvironmentVariable("HOME");
         public SQLiteConnection sqliteConnection;
         public SQLiteCommand sqliteCommand;
-        public string connection_string = @"Data Source=" + home_ + Path.PathSeparator + @"WebServerLog.sqlite";
+        public string connection_string = @"Data Source=" + home_ + Path.VolumeSeparatorChar + @"WebServerLog.sqlite";
         public Double Epoch()
         {
             return Math.Round((DateTime.UtcNow - DateTime.Parse("1970-01-01")).TotalSeconds);
