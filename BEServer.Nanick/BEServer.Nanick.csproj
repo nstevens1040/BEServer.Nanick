@@ -52,6 +52,7 @@
     </Reference>
     <Reference Include="SQLiteLogger">
       <HintPath>lib\SQLiteLogger.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="System.Data.SQLite">
       <HintPath>lib\System.Data.SQLite.dll</HintPath>
