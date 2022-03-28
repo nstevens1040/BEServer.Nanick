@@ -1,6 +1,6 @@
 version: 1.1.{build}
 image: Linux
-build_cloud: UBUNTU-PROD-DO-01
+build_cloud: UBUNTU-PROD-DO
 before_build:
 - systemctl stop beserver
 - nuget restore
