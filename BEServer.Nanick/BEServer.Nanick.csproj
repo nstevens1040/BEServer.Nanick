@@ -11,6 +11,7 @@
     <None Remove="lib\HtmlAgilityPack.dll" />
     <None Remove="lib\MimeKit.dll" />
     <None Remove="lib\Newtonsoft.Json.dll" />
+    <None Remove="lib\System.Data.SQLite.dll" />
     <None Remove="lib\System.Security.Permissions.dll" />
   </ItemGroup>
 
@@ -19,16 +20,14 @@
     <EmbeddedResource Include="lib\HtmlAgilityPack.dll" />
     <EmbeddedResource Include="lib\MimeKit.dll" />
     <EmbeddedResource Include="lib\Newtonsoft.Json.dll" />
+    <EmbeddedResource Include="lib\System.Data.SQLite.dll" />
     <EmbeddedResource Include="lib\System.Security.Permissions.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115.5" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Execute.HttpRequest.Core">
       <HintPath>lib\Execute.HttpRequest.Core.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>lib\HtmlAgilityPack.dll</HintPath>
@@ -36,9 +35,14 @@
     </Reference>
     <Reference Include="MimeKit">
       <HintPath>lib\MimeKit.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+    </Reference>
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\..\..\..\Users\nstevens\source\repos\beserver.nanick.org\beserver.nanick.org\lib\System.Data.SQLite.dll</HintPath>
       <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="System.Security.Permissions">

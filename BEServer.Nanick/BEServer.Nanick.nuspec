@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>BEServer.Nanick</id>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <title>BEServer.Nanick</title>
     <authors>nstevens1040</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -11,7 +11,7 @@
     <description>.NET backend server</description>
     <releaseNotes>First release</releaseNotes>
     <copyright>Copyright © nstevens1040 2022</copyright>
-    <tags>http-request http-response http https http-client dotnet-framework csharp http-get http-post http-put http-delete http-trace cookies</tags>
+    <tags>backend server http-listener</tags>
     <repository type="git" url="https://github.com/nstevens1040/BEServer.Nanick.git" branch="master" commit="" />
   </metadata>
 </package>
