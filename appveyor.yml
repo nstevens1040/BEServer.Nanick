@@ -2,7 +2,6 @@ version: 1.0.{build}
 image: Linux
 build_cloud: UBUNTU-PROD-DO
 before_build:
-- systemctl stop beserver
 - nuget restore
 nuget:
   project_feed: true
