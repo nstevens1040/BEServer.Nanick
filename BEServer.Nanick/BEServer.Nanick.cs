@@ -97,24 +97,37 @@
         {
             await Task.Factory.StartNew(() =>
             {
-                string jsonret = "{\"status\": \"rebuilding\"}";
-                byte[] buffe = Encoding.UTF8.GetBytes(jsonret);
-                context.Response.ContentEncoding = Encoding.UTF8;
-                context.Response.ContentLength64 = buffe.Length;
-                context.Response.OutputStream.Write(buffe, 0, buffe.Length);
-                context.Response.StatusCode = 200;
-                context.Response.StatusDescription = "Ok";
-                context.Response.Close();
-                using (Process p = new Process()
+                if (context.Request.HttpMethod == "POST")
                 {
-                    StartInfo = new ProcessStartInfo()
+                    string jsonret = "{\"status\": \"rebuilding\"}";
+                    byte[] buffe = Encoding.UTF8.GetBytes(jsonret);
+                    context.Response.ContentEncoding = Encoding.UTF8;
+                    context.Response.ContentLength64 = buffe.Length;
+                    context.Response.OutputStream.Write(buffe, 0, buffe.Length);
+                    context.Response.StatusCode = 200;
+                    context.Response.StatusDescription = "Ok";
+                    context.Response.Close();
+                    using (Process p = new Process()
                     {
-                        FileName = "nohup",
-                        Arguments = " /bin/bash /root/Desktop/build.sh &"
+                        StartInfo = new ProcessStartInfo()
+                        {
+                            FileName = "nohup",
+                            Arguments = " /bin/bash /root/Desktop/build.sh &"
+                        }
+                    })
+                    {
+                        p.Start();
                     }
-                })
+                } else
                 {
-                    p.Start();
+                    string jsonret = "{\"405\": \"method not allowed\"}";
+                    byte[] buffe = Encoding.UTF8.GetBytes(jsonret);
+                    context.Response.ContentEncoding = Encoding.UTF8;
+                    context.Response.ContentLength64 = buffe.Length;
+                    context.Response.OutputStream.Write(buffe, 0, buffe.Length);
+                    context.Response.StatusCode = 405;
+                    context.Response.StatusDescription = "MethodNotAllowed";
+                    context.Response.Close();
                 }
             });
         }
