@@ -1,4 +1,4 @@
-version: 1.1.{build}
+version: 1.0.{build}
 image: Linux
 build_cloud: UBUNTU-PROD-DO
 before_build:
@@ -13,3 +13,10 @@ build:
   project: BEServer.Nanick.sln
 after_build:
 - systemctl start beserver
+deploy:
+  - provider: NuGet
+    server: https://nuget.pkg.github.com/nstevens1040/index.json
+    artifact: /.nupkg/
+    username: nstevens1040
+    api_key:
+      secure: f+MLRpFFOj9kyNxbFyIt2n5I/dR48bmJ6qXRB/ageJ/18o61FDhu61IZgwk9KfqD
