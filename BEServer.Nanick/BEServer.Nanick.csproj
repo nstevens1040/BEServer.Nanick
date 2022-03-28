@@ -44,6 +44,7 @@
     <Reference Include="System.Data.SQLite">
       <HintPath>..\..\..\..\Users\nstevens\source\repos\beserver.nanick.org\beserver.nanick.org\lib\System.Data.SQLite.dll</HintPath>
       <CopyLocal>False</CopyLocal>
+      <EmbedInteropTypes></EmbedInteropTypes>
     </Reference>
     <Reference Include="System.Security.Permissions">
       <HintPath>lib\System.Security.Permissions.dll</HintPath>
