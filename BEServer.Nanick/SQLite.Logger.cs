@@ -150,7 +150,7 @@
         {
             string timestamp_string = Epoch().ToString();
             Context__ context_obj = new Context__(context.Request);
-            string request_json = JsonConvert.SerializeObject(context_obj).Replace((Char)39, (Char)34);
+            string request_json = JsonConvert.SerializeObject(context_obj,Formatting.Indented).Replace((Char)39, (Char)34);
             string source_ip = context.Request.RemoteEndPoint.Address.ToString();
             string method = context.Request.HttpMethod;
             string req_uri = context.Request.Url.AbsoluteUri;
