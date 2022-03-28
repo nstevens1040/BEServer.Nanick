@@ -138,6 +138,7 @@
                 if (context.Request.HttpMethod == "GET")
                 {
                     context.Response.ContentEncoding = Encoding.UTF8;
+                    context.Response.ContentType = "text/html";
                     context.Response.StatusCode = 200;
                     context.Response.StatusDescription = "Ok";
                     using (Process p = new Process()
@@ -155,8 +156,11 @@
                     {
                         p.Start();
                         p.WaitForExit();
+                        string html_top = "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"utf-8\"/>\n        <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n        <title>WebServerLog</title>\n        <style type=\"text/css\">\n            body {\n                background-color: black;\n                color: white;\n            }\n            table,td,th {\n                border-collapse: collapse;\n                border: 1px solid grey;\n            }\n            table {\n                max-width: 100%;\n                margin: auto;\n            }\n            .container {\n                width: 50%;\n                margin: 0px auto 0px auto;\n            }\n            main {\n                width: 100%;\n            }\n        </style>\n    </head>\n    <body>\n        <main>\n            <div class=\"container\">\n                <table>\n                    <tr>\n                        <th>Timestamp</th>\n                        <th>Request object</th>\n                        <th>Request endpoint IP</th>\n                        <th>Request method</th>\n                        <th>Absolute uri</th>\n                        <th>Data size</th>\n                        <th>Referer</th>\n                        <th>Cookie count</th>\n                        <th>Is authenticated</th>\n                    </tr>\n                    ";
                         string html_table = p.StandardOutput.ReadToEnd();
-                        byte[] buffe = Encoding.UTF8.GetBytes(html_table);
+                        string html_bottom = "                </table>\n            </div>\n        </main>\n    </body>\n</html>";
+                        string all_html = html_top + html_table + html_bottom;
+                        byte[] buffe = Encoding.UTF8.GetBytes(all_html);
                         context.Response.ContentLength64 = buffe.Length;
                         context.Response.OutputStream.Write(buffe, 0, buffe.Length);
                         context.Response.Close();

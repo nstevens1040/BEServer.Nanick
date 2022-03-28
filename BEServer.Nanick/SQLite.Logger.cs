@@ -18,7 +18,7 @@
         public string ContentType { get; set; }
         public System.Net.CookieCollection Cookies { get; set; }
         public bool HasEntityBody { get; set; }
-        public System.Collections.Specialized.NameValueCollection Headers { get; set; }
+        public Dictionary<string, string> Headers { get; set; }
         public string HttpMethod { get; set; }
         public string InputStream { get; set; }
         public bool IsAuthenticated { get; set; }
@@ -43,6 +43,15 @@
         public Context__()
         {
         }
+        public Dictionary<string, string> ConvertHeaders(System.Collections.Specialized.NameValueCollection nvc)
+        {
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            foreach (string key in nvc.Keys)
+            {
+                dict.Add(key, nvc[key]);
+            }
+            return dict;
+        }
         public Context__(HttpListenerRequest request)
         {
             this.AcceptTypes = request.AcceptTypes;
@@ -51,7 +60,7 @@
             this.ContentType = request.ContentType;
             this.Cookies = request.Cookies;
             this.HasEntityBody = request.HasEntityBody;
-            this.Headers = request.Headers;
+            this.Headers = ConvertHeaders(request.Headers);
             this.HttpMethod = request.HttpMethod;
             this.InputStream = new System.IO.StreamReader(request.InputStream, request.ContentEncoding).ReadToEnd();
             this.IsAuthenticated = request.IsAuthenticated;
@@ -83,7 +92,7 @@
         public static string home_ = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("HOME")) ? Environment.GetEnvironmentVariable("USERPROFILE") : Environment.GetEnvironmentVariable("HOME");
         public SQLiteConnection sqliteConnection;
         public SQLiteCommand sqliteCommand;
-        public string connection_string = @"Data Source=" + home_ + Path.AltDirectorySeparatorChar + @"WebServerLog.sqlite;PRAGMA journal_mode=WAL;";
+        public string connection_string = @"Data Source=" + home_ + Path.DirectorySeparatorChar + @"WebServerLog.sqlite;PRAGMA journal_mode=WAL;";
         public Double Epoch()
         {
             return Math.Round((DateTime.UtcNow - DateTime.Parse("1970-01-01")).TotalSeconds);
@@ -104,9 +113,8 @@
                         dt = dataset.Tables[0];
                     }
                 }
-                catch (Exception e)
+                catch
                 {
-                    string result = e.Message;
                 }
             }
             return dt;
@@ -127,10 +135,9 @@
                         table_exists = true;
                     }
                 }
-                catch (Exception e)
+                catch
                 {
                     table_exists = false;
-                    string msg = e.Message;
                 }
             }
             return table_exists;
@@ -150,7 +157,7 @@
         {
             string timestamp_string = Epoch().ToString();
             Context__ context_obj = new Context__(context.Request);
-            string request_json = JsonConvert.SerializeObject(context_obj,Formatting.Indented).Replace((Char)39, (Char)34);
+            string request_json = JsonConvert.SerializeObject(context_obj, Formatting.Indented).Replace((Char)39, (Char)34);
             string source_ip = context.Request.RemoteEndPoint.Address.ToString();
             string method = context.Request.HttpMethod;
             string req_uri = context.Request.Url.AbsoluteUri;
