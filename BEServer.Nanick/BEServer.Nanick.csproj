@@ -12,6 +12,8 @@
     <None Remove="lib\MimeKit.dll" />
     <None Remove="lib\Newtonsoft.Json.dll" />
     <None Remove="lib\System.Data.SQLite.dll" />
+    <None Remove="lib\System.Data.SQLite.dll.altconfig" />
+    <None Remove="lib\System.Data.SQLite.xml" />
     <None Remove="lib\System.Security.Permissions.dll" />
   </ItemGroup>
 
@@ -21,6 +23,8 @@
     <EmbeddedResource Include="lib\MimeKit.dll" />
     <EmbeddedResource Include="lib\Newtonsoft.Json.dll" />
     <EmbeddedResource Include="lib\System.Data.SQLite.dll" />
+    <EmbeddedResource Include="lib\System.Data.SQLite.dll.altconfig" />
+    <EmbeddedResource Include="lib\System.Data.SQLite.xml" />
     <EmbeddedResource Include="lib\System.Security.Permissions.dll" />
   </ItemGroup>
 
@@ -43,8 +47,6 @@
     </Reference>
     <Reference Include="System.Data.SQLite">
       <HintPath>..\..\..\..\Users\nstevens\source\repos\beserver.nanick.org\beserver.nanick.org\lib\System.Data.SQLite.dll</HintPath>
-      <CopyLocal>False</CopyLocal>
-      <EmbedInteropTypes></EmbedInteropTypes>
     </Reference>
     <Reference Include="System.Security.Permissions">
       <HintPath>lib\System.Security.Permissions.dll</HintPath>
