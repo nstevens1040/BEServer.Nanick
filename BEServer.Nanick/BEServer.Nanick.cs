@@ -131,6 +131,50 @@
                 }
             });
         }
+        public static async Task showlog(HttpListenerContext context, string streambody)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                if (context.Request.HttpMethod == "GET")
+                {
+                    context.Response.ContentEncoding = Encoding.UTF8;
+                    context.Response.StatusCode = 200;
+                    context.Response.StatusDescription = "Ok";
+                    using (Process p = new Process()
+                    {
+                        StartInfo = new ProcessStartInfo()
+                        {
+                            FileName = "/bin/bash",
+                            Arguments = " /root/Desktop/select_webserverlog.sh",
+                            UseShellExecute = false,
+                            RedirectStandardError = true,
+                            RedirectStandardOutput = true,
+                            CreateNoWindow = true
+                        }
+                    })
+                    {
+                        p.Start();
+                        p.WaitForExit();
+                        string html_table = p.StandardOutput.ReadToEnd();
+                        byte[] buffe = Encoding.UTF8.GetBytes(html_table);
+                        context.Response.ContentLength64 = buffe.Length;
+                        context.Response.OutputStream.Write(buffe, 0, buffe.Length);
+                        context.Response.Close();
+                    }
+                }
+                else
+                {
+                    string jsonret = "{\"405\": \"method not allowed\"}";
+                    byte[] buffe = Encoding.UTF8.GetBytes(jsonret);
+                    context.Response.ContentEncoding = Encoding.UTF8;
+                    context.Response.ContentLength64 = buffe.Length;
+                    context.Response.OutputStream.Write(buffe, 0, buffe.Length);
+                    context.Response.StatusCode = 405;
+                    context.Response.StatusDescription = "MethodNotAllowed";
+                    context.Response.Close();
+                }
+            });
+        }
         private const int port = 8110;
         public HttpListener Listener;
         public static string home_ = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("HOME")) ? Environment.GetEnvironmentVariable("USERPROFILE") : Environment.GetEnvironmentVariable("HOME");
@@ -383,6 +427,13 @@
                             await Task.Factory.StartNew(async ()=>
                             {
                                 await rebuild(context,streambody);
+                            });
+                            handled = true;
+                            break;
+                        case "/showlog":
+                            await Task.Factory.StartNew(async () =>
+                            {
+                                await showlog(context, streambody);
                             });
                             handled = true;
                             break;
