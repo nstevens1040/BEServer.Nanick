@@ -1,6 +1,6 @@
 version: 1.0.{build}
-image: Linux
-build_cloud: UBUNTU-PROD-DO
+#image: Linux
+#build_cloud: UBUNTU-PROD-DO
 before_build:
 - dotnet restore
 nuget:
