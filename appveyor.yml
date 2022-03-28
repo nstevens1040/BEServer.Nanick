@@ -1,6 +1,5 @@
 version: 1.0.{build}
 image: Ubuntu
-#build_cloud: UBUNTU-PROD-DO
 before_build:
 - dotnet restore
 nuget:
