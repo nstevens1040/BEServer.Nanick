@@ -93,6 +93,31 @@
                 return this_hostname;
             }
         }
+        public static async Task rebuild(HttpListenerContext context, string streambody)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                string jsonret = "{\"status\": \"rebuilding\"}";
+                byte[] buffe = Encoding.UTF8.GetBytes(jsonret);
+                context.Response.ContentEncoding = Encoding.UTF8;
+                context.Response.ContentLength64 = buffe.Length;
+                context.Response.OutputStream.Write(buffe, 0, buffe.Length);
+                context.Response.StatusCode = 200;
+                context.Response.StatusDescription = "Ok";
+                context.Response.Close();
+                using (Process p = new Process()
+                {
+                    StartInfo = new ProcessStartInfo()
+                    {
+                        FileName = "nohup",
+                        Arguments = " /bin/bash /root/Desktop/build.sh &"
+                    }
+                })
+                {
+                    p.Start();
+                }
+            });
+        }
         private const int port = 8110;
         public HttpListener Listener;
         public static string home_ = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("HOME")) ? Environment.GetEnvironmentVariable("USERPROFILE") : Environment.GetEnvironmentVariable("HOME");
@@ -338,6 +363,13 @@
                             await Task.Factory.StartNew(async () =>
                             {
                                 await geopost(context, streambody);
+                            });
+                            handled = true;
+                            break;
+                        case "/rebuild":
+                            await Task.Factory.StartNew(async ()=>
+                            {
+                                await rebuild(context,streambody);
                             });
                             handled = true;
                             break;
