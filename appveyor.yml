@@ -2,7 +2,6 @@ version: 1.0.{build}
 image: Linux
 build_cloud: UBUNTU-PROD-DO
 before_build:
-- choco install nuget -y
 - nuget restore
 nuget:
   project_feed: true
@@ -11,8 +10,6 @@ build:
   include_nuget_references: true
   verbosity: normal
   project: BEServer.Nanick.sln
-after_build:
-- systemctl start beserver
 deploy:
   - provider: NuGet
     server: https://nuget.pkg.github.com/nstevens1040/index.json
