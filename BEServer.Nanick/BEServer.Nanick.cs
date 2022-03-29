@@ -17,6 +17,7 @@
     using System.Reflection;
     using SQLite;
     using System.Data.SQLite;
+    using HtmlAgilityPack;
     public class HttpServer
     {
         public Logger Logger = new Logger();
@@ -156,10 +157,49 @@
                     {
                         p.Start();
                         p.WaitForExit();
-                        string html_top = "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"utf-8\"/>\n        <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n        <title>WebServerLog</title>\n        <style type=\"text/css\">\n            body {\n                background-color: black;\n                color: white;\n            }\n            table,td,th {\n                border-collapse: collapse;\n                border: 1px solid grey;\n            }\n            table {\n                max-width: 100%;\n                margin: auto;\n            }\n            .container {\n                width: 50%;\n                margin: 0px auto 0px auto;\n            }\n            main {\n                width: 100%;\n            }\n        </style>\n    </head>\n    <body>\n        <main>\n            <div class=\"container\">\n                <table>\n                    <tr>\n                        <th>Timestamp</th>\n                        <th>Request object</th>\n                        <th>Request endpoint IP</th>\n                        <th>Request method</th>\n                        <th>Absolute uri</th>\n                        <th>Data size</th>\n                        <th>Referer</th>\n                        <th>Cookie count</th>\n                        <th>Is authenticated</th>\n                    </tr>\n                    ";
-                        string html_table = p.StandardOutput.ReadToEnd();
-                        string html_bottom = "                </table>\n            </div>\n        </main>\n    </body>\n</html>";
-                        string all_html = html_top + html_table + html_bottom;
+                        string html_table = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/><title>WebServerLog</title></head><body><table><tr><th>Timestamp</th><th>Request object</th><th>Request endpoint IP</th><th>Request method</th><th>Absolute uri</th><th>Data size</th><th>Referer</th><th>Cookie count</th><th>Is authenticated</th></tr>" + p.StandardOutput.ReadToEnd() + "</table></body></html>";
+                        HtmlDocument doc = new HtmlDocument();
+                        doc.LoadHtml(html_table);
+                        foreach (HtmlNode node in doc.DocumentNode.Descendants("tr").ToList())
+                        {
+                            for (int i = 0; i < node.Descendants("td").ToList().Count; i++)
+                            {
+                                HtmlNode cell = node.Descendants("td").ToList()[i];
+                                switch (i)
+                                {
+                                    case 0:
+                                        cell.AddClass("timestamp");
+                                        break;
+                                    case 1:
+                                        cell.AddClass("json");
+                                        break;
+                                    case 2:
+                                        cell.AddClass("localip");
+                                        break;
+                                    case 3:
+                                        cell.AddClass("method");
+                                        break;
+                                    case 4:
+                                        cell.AddClass("absoluteuri");
+                                        break;
+                                    case 5:
+                                        cell.AddClass("datasize");
+                                        break;
+                                    case 6:
+                                        cell.AddClass("referer");
+                                        break;
+                                    case 7:
+                                        cell.AddClass("cookies");
+                                        break;
+                                    case 8:
+                                        cell.AddClass("isauth");
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                        string all_html = doc.DocumentNode.OuterHtml;
                         byte[] buffe = Encoding.UTF8.GetBytes(all_html);
                         context.Response.ContentLength64 = buffe.Length;
                         context.Response.OutputStream.Write(buffe, 0, buffe.Length);
