@@ -33,7 +33,7 @@
         public string RemoteEndPoint { get; set; }
         public System.Guid RequestTraceIdentifier { get; set; }
         public string ServiceName { get; set; }
-        public System.Net.TransportContext TransportContext { get; set; }
+        public string TransportContext { get; set; }
         public Uri Url { get; set; }
         public Uri UrlReferrer { get; set; }
         public string UserAgent { get; set; }
@@ -75,7 +75,7 @@
             this.RemoteEndPoint = request.RemoteEndPoint.Address.ToString() + ':' + request.RemoteEndPoint.Port;
             this.RequestTraceIdentifier = request.RequestTraceIdentifier;
             this.ServiceName = request.ServiceName;
-            this.TransportContext = request.TransportContext;
+            this.TransportContext = request.TransportContext.ToString();
             this.Url = request.Url;
             this.UrlReferrer = request.UrlReferrer;
             this.UserAgent = request.UserAgent;
