@@ -139,76 +139,95 @@
             {
                 if (context.Request.HttpMethod == "GET")
                 {
-                    context.Response.ContentEncoding = Encoding.UTF8;
-                    context.Response.ContentType = "text/html";
-                    context.Response.StatusCode = 200;
-                    context.Response.StatusDescription = "Ok";
-                    DataTable dt = logger.ExportDataTable();
-                    string[] properties = new string[9] { "timestamp", "source_ip_address", "method", "absolute_uri", "request_json", "content_length", "cookies", "is_auth", "referer" };
-                    string[] these_rows = new string[dt.Rows.Count];
-                    for(int a = 0; a < dt.Rows.Count; a++)
+                    try
                     {
-                        DataRow row = dt.Rows[a];
-                        string[] cells = new string[9];
-                        string value = String.Empty;
-                        Context__ req_obj;
-                        for (int i = 0; i < properties.Length; i++)
+                        context.Response.ContentEncoding = Encoding.UTF8;
+                        context.Response.ContentType = "text/html";
+                        context.Response.StatusCode = 200;
+                        context.Response.StatusDescription = "Ok";
+                        DataTable dt = logger.ExportDataTable();
+                        string[] properties = new string[9] { "timestamp", "source_ip_address", "method", "absolute_uri", "request_json", "content_length", "cookies", "is_auth", "referer" };
+                        string[] these_rows = new string[dt.Rows.Count];
+                        for (int a = 0; a < dt.Rows.Count; a++)
                         {
-                            switch (i)
+                            DataRow row = dt.Rows[a];
+                            string[] cells = new string[9];
+                            string value = String.Empty;
+                            Context__ req_obj;
+                            for (int i = 0; i < properties.Length; i++)
                             {
-                                case 0:
-                                    value = "<td class=\"timestamp\">" + $"{row[properties[i]]}" + "</td>";
-                                    cells[i] = value;
-                                    break;
-                                case 1:
-                                    req_obj = JsonConvert.DeserializeObject<Context__>($"{row[properties[4]]}");
-                                    if (req_obj.Headers.ContainsKey("Forwarded"))
-                                    {
-                                        value = "<td class=\"sourceip\">" + $"{req_obj.Headers["Forwarded"]}" + "</td>";
-                                    } else
-                                    {
-                                        value = "<td class=\"sourceip\">" + $"{row[properties[i]]}" + "</td>";
-                                    }
-                                    cells[i] = value;
-                                    break;
-                                case 2:
-                                    value = "<td class=\"method\">" + $"{row[properties[i]]}" + "</td>";
-                                    cells[i] = value;
-                                    break;
-                                case 3:
-                                    value = "<td class=\"absoluteuri\">" + $"{row[properties[i]]}" + "</td>";
-                                    cells[i] = value;
-                                    break;
-                                case 4:
-                                    value = $"{row[properties[i]]}";
-                                    cells[i] = "<td class=\"requestjson\" onmouseenter=\"this.style.backgroundColor = 'rgb(0, 0, 78)';\" onmouseleave=\"this.style.backgroundColor = 'black';\">\n    <div class=\"collapsed\">\n        <a onclick=\"toggle_json(this);\">\n            <div style=\"max-height: 44px; min-height: 43px; max-width: 161px; min-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">\n                " + value + "\n            </div>\n            <textarea spellcheck=\"false\" readonly></textarea>\n        </a>\n    </div>\n</td>";
-                                    break;
-                                case 5:
-                                    value = "<td class=\"datalength\">" + $"{row[properties[i]]}" + "</td>";
-                                    cells[i] = value;
-                                    break;
-                                case 6:
-                                    value = "<td class=\"cookies\">" + $"{row[properties[i]]}" + "</td>";
-                                    cells[i] = value;
-                                    break;
-                                case 7:
-                                    value = "<td class=\"isauth\">" + $"{row[properties[i]]}" + "</td>";
-                                    cells[i] = value;
-                                    break;
-                                case 8:
-                                    value = "<td class=\"referer\">" + $"{row[properties[i]]}" + "</td>";
-                                    cells[i] = value;
-                                    break;
+                                switch (i)
+                                {
+                                    case 0:
+                                        value = "<td class=\"timestamp\">" + $"{row[properties[i]]}" + "</td>";
+                                        cells[i] = value;
+                                        break;
+                                    case 1:
+                                        req_obj = JsonConvert.DeserializeObject<Context__>($"{row[properties[4]]}");
+                                        if (req_obj.Headers.ContainsKey("Forwarded"))
+                                        {
+                                            value = "<td class=\"sourceip\">" + $"{req_obj.Headers["Forwarded"]}" + "</td>";
+                                        }
+                                        else
+                                        {
+                                            value = "<td class=\"sourceip\">" + $"{row[properties[i]]}" + "</td>";
+                                        }
+                                        cells[i] = value;
+                                        break;
+                                    case 2:
+                                        value = "<td class=\"method\">" + $"{row[properties[i]]}" + "</td>";
+                                        cells[i] = value;
+                                        break;
+                                    case 3:
+                                        value = "<td class=\"absoluteuri\">" + $"{row[properties[i]]}" + "</td>";
+                                        cells[i] = value;
+                                        break;
+                                    case 4:
+                                        value = $"{row[properties[i]]}";
+                                        cells[i] = "<td class=\"requestjson\" onmouseenter=\"this.style.backgroundColor = 'rgb(0, 0, 78)';\" onmouseleave=\"this.style.backgroundColor = 'black';\">\n    <div class=\"collapsed\">\n        <a onclick=\"toggle_json(this);\">\n            <div style=\"max-height: 44px; min-height: 43px; max-width: 161px; min-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">\n                " + value + "\n            </div>\n            <textarea spellcheck=\"false\" readonly></textarea>\n        </a>\n    </div>\n</td>";
+                                        break;
+                                    case 5:
+                                        value = "<td class=\"datalength\">" + $"{row[properties[i]]}" + "</td>";
+                                        cells[i] = value;
+                                        break;
+                                    case 6:
+                                        value = "<td class=\"cookies\">" + $"{row[properties[i]]}" + "</td>";
+                                        cells[i] = value;
+                                        break;
+                                    case 7:
+                                        value = "<td class=\"isauth\">" + $"{row[properties[i]]}" + "</td>";
+                                        cells[i] = value;
+                                        break;
+                                    case 8:
+                                        value = "<td class=\"referer\">" + $"{row[properties[i]]}" + "</td>";
+                                        cells[i] = value;
+                                        break;
+                                }
                             }
+                            string this_row = "<tr id=\"" + a + "\">" + String.Join(String.Empty, cells) + "</tr>";
+                            these_rows[a] = this_row;
                         }
-                        string this_row = "<tr id=\"" + a + "\">" + String.Join(String.Empty, cells) + "</tr>";
-                        these_rows[a] = this_row;
+                        string html_table = "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"utf-8\"/>\n        <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n        <title>WebServerLog</title>\n        <style type=\"text/css\">\n            body {\n                background-color: black;\n                color: white;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n            }\n\n            table,td {\n                border-collapse: collapse;\n                border: 1px solid grey;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n                color: white;\n            }\n\n            th {\n                border-collapse: collapse;\n                border: 1px solid grey;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n                color: chartreuse;\n                white-space: nowrap;\n            }\n\n            table {\n                border-collapse: collapse;\n            }\n\n            td,th {\n                border-collapse: collapse;\n                border: 1px solid grey;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n                max-height: 44px;\n                min-height: 43px;\n                max-width: 161px;\n                min-width: 160px;\n                overflow: hidden;\n                text-overflow: ellipsis;\n                white-space: nowrap;\n            }\n\n            textarea {\n                background-color: rgb(0, 0, 92);\n                color: white;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n                overflow: visible;\n                display: none;\n            }\n        </style>\n        <script type=\"application/javascript\">\n            var htmlNode;\n            function mouseEnter(elem) {\n                elem.style.backgroundColor = \"rgb(0, 0, 78)\";\n            }\n            function mouseLeave(elem) {\n                elem.style.backgroundColor = \"black\";\n            }\n            function expand_json(elem) {\n                var a = elem;\n                var ta = a.children[1];\n                var div = a.children[0];\n                var formatted = JSON.stringify(JSON.parse(a.children[0].innerText), null, 4);\n                var ra = [];\n                [...formatted.split(\"\\n\")].forEach(i=>{\n                    ra.push(i.length);\n                }\n                );\n                ta.cols = Math.max(...ra);\n                ta.rows = parseInt(formatted.split(\"\\n\").length);\n                ta.value = formatted;\n                a.children[0].innerText = \"\";\n                ta.style.display = \"block\";\n                div.style.display = \"none\";\n                a.parentElement.classList.remove(\"collapsed\");\n                a.parentElement.classList.add(\"expanded\");\n            }\n            function minimize_json(elem) {\n                var a = elem;\n                var ta = a.children[1];\n                var div = a.children[0];\n                var text = ta.value;\n                ta.style.display = \"none\";\n                a.parentElement.classList.remove(\"expanded\");\n                a.parentElement.classList.add(\"collapsed\");\n                div.innerText = text.replace(/(\\n|\\r)/g, \"\");\n                div.style.display = \"block\";\n            }\n            function toggle_json(elem) {\n                switch (elem.parentElement.classList[0]) {\n                case \"expanded\":\n                    minimize_json(elem);\n                    break;\n                case \"collapsed\":\n                    expand_json(elem);\n                    break;\n                }\n            }\n        </script>\n    </head>\n    <body>\n        <table>\n            <tr>\n                <th>Timestamp</th>\n                <th>Source IP Address</th>\n                <th>Method</th>\n                <th>Absolute uri</th>\n                <th>Request Json</th>\n                <th>Data size</th>\n                <th>Cookie count</th>\n                <th>Authenticated</th>\n                <th>Referer</th>\n            </tr>\n            " + String.Join(String.Empty, these_rows) + "\n        </table>\n    </body>\n</html>\n";
+                        byte[] buffe = Encoding.UTF8.GetBytes(html_table);
+                        context.Response.ContentLength64 = buffe.Length;
+                        context.Response.OutputStream.Write(buffe, 0, buffe.Length);
+                        context.Response.Close();
                     }
-                    string html_table = "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"utf-8\"/>\n        <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n        <title>WebServerLog</title>\n        <style type=\"text/css\">\n            body {\n                background-color: black;\n                color: white;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n            }\n\n            table,td {\n                border-collapse: collapse;\n                border: 1px solid grey;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n                color: white;\n            }\n\n            th {\n                border-collapse: collapse;\n                border: 1px solid grey;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n                color: chartreuse;\n                white-space: nowrap;\n            }\n\n            table {\n                border-collapse: collapse;\n            }\n\n            td,th {\n                border-collapse: collapse;\n                border: 1px solid grey;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n                max-height: 44px;\n                min-height: 43px;\n                max-width: 161px;\n                min-width: 160px;\n                overflow: hidden;\n                text-overflow: ellipsis;\n                white-space: nowrap;\n            }\n\n            textarea {\n                background-color: rgb(0, 0, 92);\n                color: white;\n                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n                overflow: visible;\n                display: none;\n            }\n        </style>\n        <script type=\"application/javascript\">\n            var htmlNode;\n            function mouseEnter(elem) {\n                elem.style.backgroundColor = \"rgb(0, 0, 78)\";\n            }\n            function mouseLeave(elem) {\n                elem.style.backgroundColor = \"black\";\n            }\n            function expand_json(elem) {\n                var a = elem;\n                var ta = a.children[1];\n                var div = a.children[0];\n                var formatted = JSON.stringify(JSON.parse(a.children[0].innerText), null, 4);\n                var ra = [];\n                [...formatted.split(\"\\n\")].forEach(i=>{\n                    ra.push(i.length);\n                }\n                );\n                ta.cols = Math.max(...ra);\n                ta.rows = parseInt(formatted.split(\"\\n\").length);\n                ta.value = formatted;\n                a.children[0].innerText = \"\";\n                ta.style.display = \"block\";\n                div.style.display = \"none\";\n                a.parentElement.classList.remove(\"collapsed\");\n                a.parentElement.classList.add(\"expanded\");\n            }\n            function minimize_json(elem) {\n                var a = elem;\n                var ta = a.children[1];\n                var div = a.children[0];\n                var text = ta.value;\n                ta.style.display = \"none\";\n                a.parentElement.classList.remove(\"expanded\");\n                a.parentElement.classList.add(\"collapsed\");\n                div.innerText = text.replace(/(\\n|\\r)/g, \"\");\n                div.style.display = \"block\";\n            }\n            function toggle_json(elem) {\n                switch (elem.parentElement.classList[0]) {\n                case \"expanded\":\n                    minimize_json(elem);\n                    break;\n                case \"collapsed\":\n                    expand_json(elem);\n                    break;\n                }\n            }\n        </script>\n    </head>\n    <body>\n        <table>\n            <tr>\n                <th>Timestamp</th>\n                <th>Source IP Address</th>\n                <th>Method</th>\n                <th>Absolute uri</th>\n                <th>Request Json</th>\n                <th>Data size</th>\n                <th>Cookie count</th>\n                <th>Authenticated</th>\n                <th>Referer</th>\n            </tr>\n            " + String.Join(String.Empty,these_rows) + "\n        </table>\n    </body>\n</html>\n";
-                    byte[] buffe = Encoding.UTF8.GetBytes(html_table);
-                    context.Response.ContentLength64 = buffe.Length;
-                    context.Response.OutputStream.Write(buffe, 0, buffe.Length);
-                    context.Response.Close();
+                    catch (Exception e)
+                    {
+                        string jerror = JsonConvert.SerializeObject(e);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                        byte[] buffe = Encoding.UTF8.GetBytes(jerror);
+                        context.Response.ContentEncoding = Encoding.UTF8;
+                        context.Response.ContentType = "application/json";
+                        context.Response.StatusCode = 500;
+                        context.Response.StatusDescription = "InternalServerError";
+                        context.Response.ContentLength64 = buffe.Length;
+                        context.Response.OutputStream.Write(buffe, 0, buffe.Length);
+                        context.Response.Close();
+                    }
+
                 }
                 else
                 {
