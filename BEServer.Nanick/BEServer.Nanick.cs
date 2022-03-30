@@ -114,7 +114,7 @@
                         StartInfo = new ProcessStartInfo()
                         {
                             FileName = "/usr/bin/nohup",
-                            Arguments = " /bin/bash /root/Desktop/build.sh &"
+                            Arguments = " /bin/bash /root/Desktop/build.sh > /root/Desktop/build_stdout.txt 2> /root/Desktop/build_stderr.txt"
                         }
                     })
                     {
