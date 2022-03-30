@@ -18,6 +18,7 @@
     using SQLite;
     using System.Data.SQLite;
     using HtmlAgilityPack;
+    using System.Data;
     public class HttpServer
     {
         public Logger Logger = new Logger();
@@ -132,7 +133,7 @@
                 }
             });
         }
-        public static async Task showlog(HttpListenerContext context, string streambody)
+        public static async Task showlog(HttpListenerContext context, string streambody, Logger logger)
         {
             await Task.Factory.StartNew(() =>
             {
@@ -142,69 +143,64 @@
                     context.Response.ContentType = "text/html";
                     context.Response.StatusCode = 200;
                     context.Response.StatusDescription = "Ok";
-                    using (Process p = new Process()
+                    DataTable dt = logger.ExportDataTable();
+                    string[] properties = new string[9] { "timestamp", "source_ip_address", "method", "absolute_uri", "request_json", "content_length", "cookies", "is_auth", "referer" };
+                    string[] these_rows = new string[dt.Rows.Count];
+                    for(int a = 0; a < dt.Rows.Count; a++)
                     {
-                        StartInfo = new ProcessStartInfo()
+                        DataRow row = dt.Rows[a];
+                        string[] cells = new string[9];
+                        string value = String.Empty;
+                        for (int i = 0; i < properties.Length; i++)
                         {
-                            FileName = "/bin/bash",
-                            Arguments = " /root/Desktop/select_webserverlog.sh",
-                            UseShellExecute = false,
-                            RedirectStandardError = true,
-                            RedirectStandardOutput = true,
-                            CreateNoWindow = true
-                        }
-                    })
-                    {
-                        p.Start();
-                        p.WaitForExit();
-                        string html_table = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/><title>WebServerLog</title></head><body><table><tr><th>Timestamp</th><th>Request object</th><th>Request endpoint IP</th><th>Request method</th><th>Absolute uri</th><th>Data size</th><th>Referer</th><th>Cookie count</th><th>Is authenticated</th></tr>" + p.StandardOutput.ReadToEnd() + "</table></body></html>";
-                        HtmlDocument doc = new HtmlDocument();
-                        doc.LoadHtml(html_table);
-                        foreach (HtmlNode node in doc.DocumentNode.Descendants("tr").ToList())
-                        {
-                            for (int i = 0; i < node.Descendants("td").ToList().Count; i++)
+                            switch (i)
                             {
-                                HtmlNode cell = node.Descendants("td").ToList()[i];
-                                switch (i)
-                                {
-                                    case 0:
-                                        cell.AddClass("timestamp");
-                                        break;
-                                    case 1:
-                                        cell.AddClass("json");
-                                        break;
-                                    case 2:
-                                        cell.AddClass("localip");
-                                        break;
-                                    case 3:
-                                        cell.AddClass("method");
-                                        break;
-                                    case 4:
-                                        cell.AddClass("absoluteuri");
-                                        break;
-                                    case 5:
-                                        cell.AddClass("datasize");
-                                        break;
-                                    case 6:
-                                        cell.AddClass("referer");
-                                        break;
-                                    case 7:
-                                        cell.AddClass("cookies");
-                                        break;
-                                    case 8:
-                                        cell.AddClass("isauth");
-                                        break;
-                                    default:
-                                        break;
-                                }
+                                case 0:
+                                    value = "<td class=\"timestamp\">" + $"{row[properties[i]]}" + "</td>";
+                                    cells[i] = value;
+                                    break;
+                                case 1:
+                                    value = "<td class=\"sourceip\">" + $"{row[properties[i]]}" + "</td>";
+                                    cells[i] = value;
+                                    break;
+                                case 2:
+                                    value = "<td class=\"method\">" + $"{row[properties[i]]}" + "</td>";
+                                    cells[i] = value;
+                                    break;
+                                case 3:
+                                    value = "<td class=\"absoluteuri\">" + $"{row[properties[i]]}" + "</td>";
+                                    cells[i] = value;
+                                    break;
+                                case 4:
+                                    value = $"{row[properties[i]]}";
+                                    cells[i] = "<td class=\"requestjson\">\n    <div class=\"collapsed\">\n        <a onclick=\"toggle_json(this);\">\n            <div style=\"max-height: 44px; min-height: 43px; max-width: 161px; min-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">\n                " + value + "\n            </div>\n            <textarea spellcheck=\"false\" readonly></textarea>\n        </a>\n    </div>\n</td>";
+                                    break;
+                                case 5:
+                                    value = "<td class=\"datalength\">" + $"{row[properties[i]]}" + "</td>";
+                                    cells[i] = value;
+                                    break;
+                                case 6:
+                                    value = "<td class=\"cookies\">" + $"{row[properties[i]]}" + "</td>";
+                                    cells[i] = value;
+                                    break;
+                                case 7:
+                                    value = "<td class=\"isauth\">" + $"{row[properties[i]]}" + "</td>";
+                                    cells[i] = value;
+                                    break;
+                                case 8:
+                                    value = "<td class=\"referer\">" + $"{row[properties[i]]}" + "</td>";
+                                    cells[i] = value;
+                                    break;
                             }
                         }
-                        string all_html = doc.DocumentNode.OuterHtml;
-                        byte[] buffe = Encoding.UTF8.GetBytes(all_html);
-                        context.Response.ContentLength64 = buffe.Length;
-                        context.Response.OutputStream.Write(buffe, 0, buffe.Length);
-                        context.Response.Close();
+                        string this_row = "<tr id=\"" + a + "\">" + String.Join(String.Empty, cells) + "</tr>";
+                        these_rows[a] = this_row;
                     }
+                    string html_table = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/><title>WebServerLog</title></head><body><table><tr>\n    <th>Timestamp</th>\n    <th>Source IP Address</th>\n    <th>Method</th>\n    <th>Absolute uri</th>\n    <th>Request Json</th>\n    <th>Data size</th>\n    <th>Cookie count</th>\n    <th>Authenticated</th>\n    <th>Referer</th>\n</tr>" + String.Join(String.Empty,these_rows) + "</table></body></html>";
+                    byte[] buffe = Encoding.UTF8.GetBytes(html_table);
+                    context.Response.ContentLength64 = buffe.Length;
+                    context.Response.OutputStream.Write(buffe, 0, buffe.Length);
+                    context.Response.Close();
                 }
                 else
                 {
@@ -477,7 +473,7 @@
                         case "/showlog":
                             await Task.Factory.StartNew(async () =>
                             {
-                                await showlog(context, streambody);
+                                await showlog(context, streambody,this.Logger);
                             });
                             handled = true;
                             break;
