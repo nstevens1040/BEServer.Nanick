@@ -13,7 +13,7 @@
     public class Context__
     {
         public string[] AcceptTypes { get; set; }
-        public System.Text.Encoding ContentEncoding { get; set; }
+        public string ContentEncoding { get; set; }
         public long ContentLength64 { get; set; }
         public string ContentType { get; set; }
         public System.Net.CookieCollection Cookies { get; set; }
@@ -55,7 +55,7 @@
         public Context__(HttpListenerRequest request)
         {
             this.AcceptTypes = request.AcceptTypes;
-            this.ContentEncoding = request.ContentEncoding;
+            this.ContentEncoding = request.ContentEncoding.EncodingName;
             this.ContentLength64 = request.ContentLength64;
             this.ContentType = request.ContentType;
             this.Cookies = request.Cookies;
