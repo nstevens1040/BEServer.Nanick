@@ -453,8 +453,28 @@
                 }
             });
         }
+        public static async Task<bool> CheckAuth(HttpListenerContext context)
+        {
+            bool authenticated = false;
+            await Task.Factory.StartNew(() =>
+            {
+                if(context.Request.Cookies.Count > 0)
+                {
+                    if (context.Request.Cookies.ToList().Where(i => { return (i.Name == "PHPSESSID"); }).ToList().Count > 0)
+                    {
+                        CookieCollection my_cookies = context.Request.Cookies;
+                        if(Int32.Parse(Execute.HttpRequest.Send("https://beserver.nanick.org/check.php",HttpMethod.Get,null,my_cookies).ResponseText) == 1)
+                        {
+                            authenticated = true;
+                        }
+                    }
+                }
+            });
+            return authenticated;
+        }
         public async Task ProcessRequestAsync(HttpListenerContext context)
         {
+            bool is_authenticated = await CheckAuth(context);
             this.Logger.SQLiteInsert(context);
             string abs_path = context.Request.Url == null ? String.Empty : context.Request.Url.AbsolutePath.ToLower();
             string streambody = String.Empty;
@@ -500,10 +520,20 @@
                             handled = true;
                             break;
                         case "/showlog":
-                            await Task.Factory.StartNew(async () =>
+                            if (is_authenticated)
                             {
-                                await showlog(context, streambody,this.Logger);
-                            });
+                                await Task.Factory.StartNew(async () =>
+                                {
+                                    await showlog(context, streambody, this.Logger);
+                                });
+                            } else
+                            {
+                                context.Response.AddHeader("Location", @"https://beserver.nanick.org/login.php&r=https%3A%2F%2Fbeserver.nanick.org%2Fshowlog");
+                                context.Response.StatusCode = 401;
+                                context.Response.StatusDescription = "Unauthorized";
+                                context.Response.Redirect(@"https://beserver.nanick.org/login.php&r=https%3A%2F%2Fbeserver.nanick.org%2Fshowlog");
+                                context.Response.Close();
+                            }
                             handled = true;
                             break;
                         default:
