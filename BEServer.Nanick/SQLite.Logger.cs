@@ -97,6 +97,10 @@
         {
             return Math.Round((DateTime.UtcNow - DateTime.Parse("1970-01-01")).TotalSeconds);
         }
+        public DateTime UnEpoch(Double timestamp)
+        {
+            return DateTime.Parse("1970-01-01").AddSeconds(timestamp).ToLocalTime();
+        }
         public System.Data.DataTable ExportDataTable()
         {
             System.Data.DataTable dt = new System.Data.DataTable();

@@ -159,7 +159,9 @@
                                 switch (i)
                                 {
                                     case 0:
-                                        value = "<td class=\"timestamp\">" + $"{row[properties[i]]}" + "</td>";
+                                        //.ToString("yyyy-MM-dd hh:mm:ss")
+                                        string timestamp = logger.UnEpoch(Double.Parse($"{row[properties[i]]}")).ToString("yyyy-MM-dd hh:mm:ss");
+                                        value = "<td class=\"timestamp\">" + $"{timestamp}" + "</td>";
                                         cells[i] = value;
                                         break;
                                     case 1:
