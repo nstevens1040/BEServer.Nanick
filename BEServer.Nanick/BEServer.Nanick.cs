@@ -173,7 +173,7 @@
                                     break;
                                 case 4:
                                     value = $"{row[properties[i]]}";
-                                    cells[i] = "<td class=\"requestjson\" onmouseenter=\"mouseEnter(this);\" onmouseleave=\"mouseLeave(this);\">\n    <div class=\"collapsed\">\n        <a onclick=\"toggle_json(this);\">\n            <div style=\"max-height: 44px; min-height: 43px; max-width: 161px; min-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">\n                " + value + "\n            </div>\n            <textarea spellcheck=\"false\" readonly></textarea>\n        </a>\n    </div>\n</td>";
+                                    cells[i] = "<td class=\"requestjson\" onmouseenter=\"this.style.backgroundColor = 'rgb(0, 0, 78)';\" onmouseleave=\"this.style.backgroundColor = 'black';\">\n    <div class=\"collapsed\">\n        <a onclick=\"toggle_json(this);\">\n            <div style=\"max-height: 44px; min-height: 43px; max-width: 161px; min-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">\n                " + value + "\n            </div>\n            <textarea spellcheck=\"false\" readonly></textarea>\n        </a>\n    </div>\n</td>";
                                     break;
                                 case 5:
                                     value = "<td class=\"datalength\">" + $"{row[properties[i]]}" + "</td>";
