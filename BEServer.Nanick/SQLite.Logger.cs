@@ -28,7 +28,7 @@
         public bool KeepAlive { get; set; }
         public string LocalEndPoint { get; set; }
         public System.Version ProtocolVersion { get; set; }
-        public System.Collections.Specialized.NameValueCollection QueryString { get; set; }
+        public Dictionary<string,string> QueryString { get; set; }
         public string RawUrl { get; set; }
         public string RemoteEndPoint { get; set; }
         public System.Guid RequestTraceIdentifier { get; set; }
@@ -70,7 +70,7 @@
             this.KeepAlive = request.KeepAlive;
             this.LocalEndPoint = request.LocalEndPoint.Address.ToString() + ':' + request.LocalEndPoint.Port;
             this.ProtocolVersion = request.ProtocolVersion;
-            this.QueryString = request.QueryString;
+            this.QueryString = ConvertHeaders(request.QueryString);
             this.RawUrl = request.RawUrl;
             this.RemoteEndPoint = request.RemoteEndPoint.Address.ToString() + ':' + request.RemoteEndPoint.Port;
             this.RequestTraceIdentifier = request.RequestTraceIdentifier;
