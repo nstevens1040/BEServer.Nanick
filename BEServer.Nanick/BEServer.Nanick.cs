@@ -475,6 +475,20 @@
             }
             return authenticated;
         }
+        public static async Task login(HttpListenerContext context)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                string loginhtml = "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n        <title>Login</title>\n        <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css\">\n        <style>\n            body {\n                font: 14px sans-serif;\n            }\n\n            .wrapper {\n                width: 360px;\n                padding: 20px;\n            }\n        </style>\n    </head>\n    <body>\n        <div class=\"wrapper\">\n            <h2>Login</h2>\n            <p>Please fill in your credentials to login.</p>\n            <form action=\"/action.php\" method=\"post\">\n                <div class=\"form-group\">\n                    <label>Username</label>\n                    <input type=\"text\" name=\"username\" class=\"form-control \" value=\"\">\n                    <span class=\"invalid-feedback\"></span>\n                </div>\n                <div class=\"form-group\">\n                    <label>Password</label>\n                    <input type=\"password\" name=\"password\" class=\"form-control \">\n                    <span class=\"invalid-feedback\"></span>\n                </div>\n                <div class=\"form-group\">\n                    <input type=\"submit\" class=\"btn btn-primary\" value=\"Login\">\n                </div>\n                <p>\n                    Don't have an account? <a href=\"register.php\">Sign up now</a>\n                    .\n                </p>\n            </form>\n        </div>\n    </body>\n</html>\n";
+                byte[] loginbyte = Encoding.UTF8.GetBytes(loginhtml);
+                context.Response.ContentEncoding = Encoding.UTF8;
+                context.Response.ContentLength64 = loginbyte.Length;
+                context.Response.OutputStream.Write(loginbyte, 0, loginbyte.Length);
+                context.Response.StatusCode = 200;
+                context.Response.StatusDescription = "Ok";
+                context.Response.Close();
+            });
+        }
         public async Task ProcessRequestAsync(HttpListenerContext context)
         {
             bool is_authenticated = CheckAuth(context);
@@ -522,6 +536,8 @@
                             });
                             handled = true;
                             break;
+                        case "/login":
+
                         case "/showlog":
                             if (is_authenticated)
                             {
