@@ -113,8 +113,8 @@
                     {
                         StartInfo = new ProcessStartInfo()
                         {
-                            FileName = "/usr/bin/nohup",
-                            Arguments = "/root/Desktop/build.sh &"
+                            FileName = "nohup",
+                            Arguments = " /home/nstevens/BEServer.Build &"
                         }
                     })
                     {
