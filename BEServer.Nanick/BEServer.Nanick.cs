@@ -537,7 +537,12 @@
                             handled = true;
                             break;
                         case "/login":
-
+                            await Task.Factory.StartNew(async () =>
+                            {
+                                await login(context);
+                            });
+                            handled = true;
+                            break;
                         case "/showlog":
                             if (is_authenticated)
                             {
