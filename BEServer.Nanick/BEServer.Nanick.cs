@@ -113,8 +113,8 @@
                     {
                         StartInfo = new ProcessStartInfo()
                         {
-                            FileName = "nohup",
-                            Arguments = " /home/nstevens/BEServer.Build &"
+                            FileName = "/home/nstevens/BEServer.Build",
+                            Arguments = "&"
                         }
                     })
                     {
