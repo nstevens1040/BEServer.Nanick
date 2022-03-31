@@ -453,34 +453,31 @@
                 }
             });
         }
-        public static async Task<bool> CheckAuth(HttpListenerContext context)
+        public static bool CheckAuth(HttpListenerContext context)
         {
             bool authenticated = false;
-            await Task.Factory.StartNew(() =>
+            if(context.Request.Cookies.Count > 0)
             {
-                if(context.Request.Cookies.Count > 0)
+                if (context.Request.Cookies.ToList().Where(i => { return (i.Name == "PHPSESSID"); }).ToList().Count > 0)
                 {
-                    if (context.Request.Cookies.ToList().Where(i => { return (i.Name == "PHPSESSID"); }).ToList().Count > 0)
+                    CookieCollection my_cookies = new CookieCollection();
+                    context.Request.Cookies.ToList().ForEach(i =>
                     {
-                        CookieCollection my_cookies = new CookieCollection();
-                        context.Request.Cookies.ToList().ForEach(i =>
-                        {
-                            i.Domain = "beserver.nanick.org";
-                            i.Path = "/";
-                            my_cookies.Add(i);
-                        });
-                        if(Int32.Parse(Execute.HttpRequest.Send("https://beserver.nanick.org/check.php",HttpMethod.Get,null,my_cookies).ResponseText) == 1)
-                        {
-                            authenticated = true;
-                        }
+                        i.Domain = "beserver.nanick.org";
+                        i.Path = "/";
+                        my_cookies.Add(i);
+                    });
+                    if(Int32.Parse(Execute.HttpRequest.Send("https://beserver.nanick.org/check.php",HttpMethod.Get,null,my_cookies).ResponseText) == 1)
+                    {
+                        authenticated = true;
                     }
                 }
-            });
+            }
             return authenticated;
         }
         public async Task ProcessRequestAsync(HttpListenerContext context)
         {
-            bool is_authenticated = await CheckAuth(context);
+            bool is_authenticated = CheckAuth(context);
             this.Logger.SQLiteInsert(context);
             string abs_path = context.Request.Url == null ? String.Empty : context.Request.Url.AbsolutePath.ToLower();
             string streambody = String.Empty;
