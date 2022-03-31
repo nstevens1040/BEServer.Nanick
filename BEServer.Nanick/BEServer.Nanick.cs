@@ -462,7 +462,13 @@
                 {
                     if (context.Request.Cookies.ToList().Where(i => { return (i.Name == "PHPSESSID"); }).ToList().Count > 0)
                     {
-                        CookieCollection my_cookies = context.Request.Cookies;
+                        CookieCollection my_cookies = new CookieCollection();
+                        context.Request.Cookies.ToList().ForEach(i =>
+                        {
+                            i.Domain = "beserver.nanick.org";
+                            i.Path = "/";
+                            my_cookies.Add(i);
+                        });
                         if(Int32.Parse(Execute.HttpRequest.Send("https://beserver.nanick.org/check.php",HttpMethod.Get,null,my_cookies).ResponseText) == 1)
                         {
                             authenticated = true;
