@@ -52,7 +52,7 @@
             }
             return dict;
         }
-        public Context__(HttpListenerRequest request)
+        public Context__(HttpListenerRequest request,string streambody=null)
         {
             this.AcceptTypes = request.AcceptTypes;
             this.ContentEncoding = request.ContentEncoding.EncodingName;
@@ -62,7 +62,7 @@
             this.HasEntityBody = request.HasEntityBody;
             this.Headers = ConvertHeaders(request.Headers);
             this.HttpMethod = request.HttpMethod;
-            this.InputStream = new System.IO.StreamReader(request.InputStream, request.ContentEncoding).ReadToEnd();
+            this.InputStream = streambody;
             this.IsAuthenticated = request.IsAuthenticated;
             this.IsLocal = request.IsLocal;
             this.IsSecureConnection = request.IsSecureConnection;
@@ -157,10 +157,17 @@
                 this.sqliteCommand.ExecuteNonQuery();
             }
         }
-        public void SQLiteInsert(HttpListenerContext context)
+        public void SQLiteInsert(HttpListenerContext context,string streambody=null)
         {
             string timestamp_string = Epoch().ToString();
-            Context__ context_obj = new Context__(context.Request);
+            Context__ context_obj;
+            if (String.IsNullOrEmpty(streambody))
+            {
+                context_obj = new Context__(context.Request);
+            } else
+            {
+                context_obj = new Context__(context.Request,streambody);
+            }
             string request_json = JsonConvert.SerializeObject(context_obj, Formatting.Indented).Replace((Char)39, (Char)34);
             string source_ip = context.Request.RemoteEndPoint.Address.ToString();
             string method = context.Request.HttpMethod;

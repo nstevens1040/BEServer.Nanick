@@ -491,10 +491,11 @@
         }
         public async Task ProcessRequestAsync(HttpListenerContext context)
         {
-            bool is_authenticated = CheckAuth(context);
-            this.Logger.SQLiteInsert(context);
-            string abs_path = context.Request.Url == null ? String.Empty : context.Request.Url.AbsolutePath.ToLower();
             string streambody = String.Empty;
+            streambody = await GetRequestData(context);
+            bool is_authenticated = CheckAuth(context);
+            this.Logger.SQLiteInsert(context,streambody);
+            string abs_path = context.Request.Url == null ? String.Empty : context.Request.Url.AbsolutePath.ToLower();
             string source_ip = context.Request.RemoteEndPoint.Address.ToString();
             string method = context.Request.HttpMethod;
             NameValueCollection headers = context.Request.Headers;
