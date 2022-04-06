@@ -467,7 +467,7 @@
                         i.Path = "/";
                         my_cookies.Add(i);
                     });
-                    if(Int32.Parse(Execute.HttpRequest.Send("https://beserver.nanick.org/check.php",HttpMethod.Get,null,my_cookies).ResponseText) == 1)
+                    if(Int32.Parse(Execute.HttpRequest.Send("http://localhost:81/check.php",HttpMethod.Get,null,my_cookies).ResponseText.Trim()) == 1)
                     {
                         authenticated = true;
                     }
