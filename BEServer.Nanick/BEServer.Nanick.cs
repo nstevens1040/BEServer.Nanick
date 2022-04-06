@@ -553,11 +553,10 @@
                                 });
                             } else
                             {
-                                context.Response.AddHeader("Location", @"https://beserver.nanick.org/login.php");
-                                context.Response.AddHeader("X-Location", @"showlog");
+                                context.Response.AddHeader("Location", @"https://beserver.nanick.org/login.php?loc=showlog");
                                 context.Response.StatusCode = 401;
                                 context.Response.StatusDescription = "Unauthorized";
-                                context.Response.Redirect(@"https://beserver.nanick.org/login.php");
+                                context.Response.Redirect(@"https://beserver.nanick.org/login.php?loc=showlog");
                                 context.Response.Close();
                             }
                             handled = true;
