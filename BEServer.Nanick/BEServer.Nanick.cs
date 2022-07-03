@@ -534,6 +534,8 @@
                 if (include_recording)
                 {
                     string voicemail_file = DownloadVoiceMail(twilio_call);
+                    DateTime now = DateTime.Now;
+                    while (!File.Exists(voicemail_file) | (DateTime.Now - now).TotalSeconds < 5) { }
                     string subject = "New voicemail from " + formatted + " " + caller_name;
                     string body = "New voicemail from " + formatted + " " + caller_name + ".\nTo listen to this voicemail download the attached WAV file.\nThank you!";
                     await VoiceMailEmail(subject, body, voicemail_file);
@@ -547,7 +549,7 @@
         }
         public static async Task voice(HttpListenerContext context, string streambody)
         {
-            await Task.Factory.StartNew(() =>
+            await Task.Factory.StartNew(async () =>
             {
                 int timeOfDay = DateTime.Now.TimeOfDay.Hours;
                 string twilio_params = String.Empty;
@@ -584,6 +586,7 @@
                         context.Response.StatusCode = 200;
                         context.Response.StatusDescription = "Ok";
                         context.Response.Close();
+                        await MissedCall(twilio_call, false);
                         break;
                     case "completed":
                         string xml2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n    <Hangup></Hangup>\n</Response>";
@@ -595,6 +598,7 @@
                         context.Response.StatusCode = 200;
                         context.Response.StatusDescription = "Ok";
                         context.Response.Close();
+                        await MissedCall(twilio_call, true);
                         break;
                     case "in-progress":
                         break;
