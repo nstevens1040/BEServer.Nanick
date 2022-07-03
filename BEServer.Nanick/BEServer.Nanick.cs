@@ -480,7 +480,14 @@
                 string item = Uri.UnescapeDataString(RequestBody.Split((Char)38)[i]);
                 string key = item.Split((Char)61)[0];
                 string val = String.Join((Char)61, item.Split((Char)61).Skip(1));
-                if(key != "AddOns")
+                List<Char> spaces = new List<Char>();
+                Enumerable.Range(0, 16 - key.Length).ToList().ForEach(i =>
+                {
+                    spaces.Add((Char)32);
+                });
+                string sp = String.Join(String.Empty, spaces);
+                File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{key}{sp}{val}\n");
+                if (key != "AddOns")
                 {
                     dict.Add(key, val);
                 } else
@@ -488,8 +495,10 @@
                     addons_json = val;
                 }
             }
+            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{addons_json}\n");
             AddOns addons = JsonConvert.DeserializeObject<AddOns>(addons_json);
             string twilio_json = JsonConvert.SerializeObject(dict, Formatting.Indented);
+            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{twilio_json}\n");
             TwilioCall twilio_call = JsonConvert.DeserializeObject<TwilioCall>(twilio_json);
             twilio_call.AddOns = addons;
             return twilio_call;
@@ -607,6 +616,7 @@
                             await MissedCall(twilio_call, false);
                             break;
                         case "completed":
+                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"completed\"\n");
                             string xml2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n    <Hangup></Hangup>\n</Response>";
                             byte[] twbuffe2 = Encoding.UTF8.GetBytes(xml2);
                             context.Response.ContentType = "text/xml";
@@ -619,8 +629,10 @@
                             await MissedCall(twilio_call, true);
                             break;
                         case "in-progress":
+                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"in-progress\"\n");
                             break;
                         default:
+                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"default\"\n");
                             break;
                     }
                 });
