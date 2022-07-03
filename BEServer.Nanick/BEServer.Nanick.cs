@@ -573,6 +573,7 @@
                     {
                         twilio_params = streambody;
                     }
+                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{twilio_params}");
                     TwilioCall twilio_call = new TwilioCall();
                     //= TwilioObject(twilio_params);
                     try
