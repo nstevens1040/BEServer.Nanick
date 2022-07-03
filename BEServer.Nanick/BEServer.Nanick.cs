@@ -553,6 +553,7 @@
             {
                 await Task.Factory.StartNew(async () =>
                 {
+                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into /voice endpoint\n");
                     int timeOfDay = DateTime.Now.TimeOfDay.Hours;
                     string twilio_params = String.Empty;
                     if (String.IsNullOrEmpty(streambody))
@@ -568,6 +569,7 @@
                     switch (twilio_call.CallStatus)
                     {
                         case "ringing":
+                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"ringing\"\n");
                             switch (timeOfDay)
                             {
                                 case < 12:
@@ -576,10 +578,11 @@
                                 case < 18:
                                     greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Afternoon.mp3";
                                     break;
-                                case <= 24:
+                                default:
                                     greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Evening.mp3";
                                     break;
                             }
+                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"selected greeting: {greeting_uri}\n");
                             string xml1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n     <Play>" + greeting_uri + "</Play>\n     <Record timeout=\"120\" playBeep=\"true\"></Record>\n    <Hangup></Hangup>\n</Response>\n";
                             byte[] twbuffe1 = Encoding.UTF8.GetBytes(xml1);
                             context.Response.ContentType = "text/xml";
