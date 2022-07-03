@@ -537,32 +537,27 @@
             {
                 File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'MissedCall' method\n");
                 string formatted = FormatPhoneNumber(twilio_call.Caller);
-                string caller_name = String.Empty;
-                if(twilio_call.AddOns.results.telo_opencnam.status == "successful")
-                {
-                    caller_name = twilio_call.AddOns.results.telo_opencnam.result.name.Replace((Char)43, (Char)32);
-                } else
-                {
-                    caller_name = twilio_call.CallerName.Replace((Char)43, (Char)32);
-                }
                 if (include_recording)
                 {
+
                     string voicemail_file = DownloadVoiceMail(twilio_call);
                     DateTime now = DateTime.Now;
                     while (!File.Exists(voicemail_file) | (DateTime.Now - now).TotalSeconds < 5) { }
-                    string subject = "New voicemail from " + formatted + " " + caller_name;
-                    string body = "New voicemail from " + formatted + " " + caller_name + ".\nTo listen to this voicemail download the attached WAV file.\nThank you!";
+                    string subject = "New voicemail from " + formatted + " " + telo_opencnam;
+                    string body = "New voicemail from " + formatted + " " + telo_opencnam + ".\nTo listen to this voicemail download the attached WAV file.\nThank you!";
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", "attempting to attach voicemail file\n");
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"subject: {subject}\nbody: {body}\n");
                     await VoiceMailEmail(subject, body, voicemail_file);
+                    telo_opencnam = String.Empty;
                 } else
                 {
-                    string subject = "Missed call from " + formatted + " " + caller_name;
-                    string body = "You've missed a call from " + formatted + " " + caller_name + ".";
+                    string subject = "Missed call from " + formatted + " " + telo_opencnam;
+                    string body = "You've missed a call from " + formatted + " " + telo_opencnam + ".";
                     await VoiceMailEmail(subject, body);
                 }
             });
         }
+        public static string telo_opencnam { get; set; }
         public static async Task voice(HttpListenerContext context, string streambody)
         {
             try
@@ -599,6 +594,15 @@
                     switch (twilio_call.CallStatus)
                     {
                         case "ringing":
+
+                            if (twilio_call.AddOns.results.telo_opencnam.status == "successful")
+                            {
+                                telo_opencnam = twilio_call.AddOns.results.telo_opencnam.result.name.Replace((Char)43, (Char)32);
+                            }
+                            else
+                            {
+                                telo_opencnam = twilio_call.CallerName.Replace((Char)43, (Char)32);
+                            }
                             File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"ringing\"\n");
                             switch (timeOfDay)
                             {
