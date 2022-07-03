@@ -563,6 +563,7 @@
                 await Task.Factory.StartNew(async () =>
                 {
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into /voice endpoint\n");
+                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"streambody: {streambody}\n");
                     int timeOfDay = DateTime.Now.TimeOfDay.Hours;
                     string twilio_params = String.Empty;
                     if (String.IsNullOrEmpty(streambody))
