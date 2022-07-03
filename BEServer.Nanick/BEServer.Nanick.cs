@@ -786,7 +786,6 @@
             NameValueCollection headers = context.Request.Headers;
             CookieCollection cookies = context.Request.Cookies;
             bool is_auth = context.Request.IsAuthenticated;
-            streambody = await GetRequestData(context);
             bool handled = await HandleFileRequest(context);
             if (!handled)
             {
