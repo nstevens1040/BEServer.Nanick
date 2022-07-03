@@ -538,7 +538,7 @@
                 File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'MissedCall' method\n");
                 string formatted = FormatPhoneNumber(twilio_call.Caller);
                 string caller_name = String.Empty;
-                if (twilio_call.AddOns != null)
+                if (twilio_call.AddOns.results.telo_opencnam.status == "successful")
                 {
                     caller_name = twilio_call.AddOns.results.telo_opencnam.result.name.Replace((Char)43, (Char)32);
                 }
