@@ -523,7 +523,7 @@
             string voice_mail = $"{home_}/.TEMP/VOICEMAIL/{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
             using (WebClient wc = new WebClient())
             {
-                string filepath = $"{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}";
+                string filepath = $"{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
                 wc.DownloadFile(
                     twilio_call.RecordingUrl,
                     filepath
