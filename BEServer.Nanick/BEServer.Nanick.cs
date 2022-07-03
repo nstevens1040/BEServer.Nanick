@@ -549,63 +549,81 @@
         }
         public static async Task voice(HttpListenerContext context, string streambody)
         {
-            await Task.Factory.StartNew(async () =>
+            try
             {
-                int timeOfDay = DateTime.Now.TimeOfDay.Hours;
-                string twilio_params = String.Empty;
-                if (String.IsNullOrEmpty(streambody))
+                await Task.Factory.StartNew(async () =>
                 {
-                    twilio_params = context.Request.Url.Query.Substring(1);
-                } else
-                {
-                    twilio_params = streambody;
-                }
-                TwilioCall twilio_call = TwilioObject(twilio_params);
-                string greeting_uri = String.Empty;
-                switch (twilio_call.CallStatus)
-                {
-                    case "ringing":
-                        switch (timeOfDay)
-                        {
-                            case < 12:
-                                greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Morning.mp3";
-                                break;
-                            case < 18:
-                                greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Afternoon.mp3";
-                                break;
-                            case <= 24:
-                                greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Evening.mp3";
-                                break;
-                        }
-                        string xml1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n     <Play>" + greeting_uri + "</Play>\n     <Record timeout=\"120\" playBeep=\"true\"></Record>\n    <Hangup></Hangup>\n</Response>\n";
-                        byte[] twbuffe1 = Encoding.UTF8.GetBytes(xml1);
-                        context.Response.ContentType = "text/xml";
-                        context.Response.ContentEncoding = Encoding.UTF8;
-                        context.Response.ContentLength64 = twbuffe1.Length;
-                        context.Response.OutputStream.Write(twbuffe1, 0, twbuffe1.Length);
-                        context.Response.StatusCode = 200;
-                        context.Response.StatusDescription = "Ok";
-                        context.Response.Close();
-                        await MissedCall(twilio_call, false);
-                        break;
-                    case "completed":
-                        string xml2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n    <Hangup></Hangup>\n</Response>";
-                        byte[] twbuffe2 = Encoding.UTF8.GetBytes(xml2);
-                        context.Response.ContentType = "text/xml";
-                        context.Response.ContentEncoding = Encoding.UTF8;
-                        context.Response.ContentLength64 = twbuffe2.Length;
-                        context.Response.OutputStream.Write(twbuffe2, 0, twbuffe2.Length);
-                        context.Response.StatusCode = 200;
-                        context.Response.StatusDescription = "Ok";
-                        context.Response.Close();
-                        await MissedCall(twilio_call, true);
-                        break;
-                    case "in-progress":
-                        break;
-                    default:
-                        break;
-                }
-            });
+                    int timeOfDay = DateTime.Now.TimeOfDay.Hours;
+                    string twilio_params = String.Empty;
+                    if (String.IsNullOrEmpty(streambody))
+                    {
+                        twilio_params = context.Request.Url.Query.Substring(1);
+                    }
+                    else
+                    {
+                        twilio_params = streambody;
+                    }
+                    TwilioCall twilio_call = TwilioObject(twilio_params);
+                    string greeting_uri = String.Empty;
+                    switch (twilio_call.CallStatus)
+                    {
+                        case "ringing":
+                            switch (timeOfDay)
+                            {
+                                case < 12:
+                                    greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Morning.mp3";
+                                    break;
+                                case < 18:
+                                    greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Afternoon.mp3";
+                                    break;
+                                case <= 24:
+                                    greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Evening.mp3";
+                                    break;
+                            }
+                            string xml1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n     <Play>" + greeting_uri + "</Play>\n     <Record timeout=\"120\" playBeep=\"true\"></Record>\n    <Hangup></Hangup>\n</Response>\n";
+                            byte[] twbuffe1 = Encoding.UTF8.GetBytes(xml1);
+                            context.Response.ContentType = "text/xml";
+                            context.Response.ContentEncoding = Encoding.UTF8;
+                            context.Response.ContentLength64 = twbuffe1.Length;
+                            context.Response.OutputStream.Write(twbuffe1, 0, twbuffe1.Length);
+                            context.Response.StatusCode = 200;
+                            context.Response.StatusDescription = "Ok";
+                            context.Response.Close();
+                            await MissedCall(twilio_call, false);
+                            break;
+                        case "completed":
+                            string xml2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n    <Hangup></Hangup>\n</Response>";
+                            byte[] twbuffe2 = Encoding.UTF8.GetBytes(xml2);
+                            context.Response.ContentType = "text/xml";
+                            context.Response.ContentEncoding = Encoding.UTF8;
+                            context.Response.ContentLength64 = twbuffe2.Length;
+                            context.Response.OutputStream.Write(twbuffe2, 0, twbuffe2.Length);
+                            context.Response.StatusCode = 200;
+                            context.Response.StatusDescription = "Ok";
+                            context.Response.Close();
+                            await MissedCall(twilio_call, true);
+                            break;
+                        case "in-progress":
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                string jerror = JsonConvert.SerializeObject(e);
+                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                byte[] htmlIndex = Encoding.UTF8.GetBytes(jerror);
+                context.Response.ContentEncoding = Encoding.UTF8;
+                context.Response.ContentType = "application/json";
+                context.Response.ContentLength64 = htmlIndex.Length;
+                context.Response.OutputStream.Write(htmlIndex, 0, htmlIndex.Length);
+                context.Response.StatusCode = 500;
+                context.Response.StatusDescription = "Ok";
+                context.Response.OutputStream.Close();
+            }
         }
         public static async Task geopost(HttpListenerContext context, string streambody)
         {
