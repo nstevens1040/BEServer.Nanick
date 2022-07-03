@@ -754,6 +754,13 @@
                             });
                             handled = true;
                             break;
+                        case "/voice":
+                            await Task.Factory.StartNew(async () =>
+                            {
+                                await voice(context, streambody);
+                            });
+                            handled = true;
+                            break;
                         case "/geo":
                             await Task.Factory.StartNew(async () =>
                             {
