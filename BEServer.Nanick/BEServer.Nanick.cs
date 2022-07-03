@@ -445,13 +445,13 @@
             await Task.Factory.StartNew(() =>
             {
                 File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'VoiceMailEmail' method\n");
-                File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"user: {Environment.GetEnvironmentVariable("SMTP_USER")}\npass:{Environment.GetEnvironmentVariable("SMTP_PASS")}\n");
+                //File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"user: {Environment.GetEnvironmentVariable("SMTP_USER")}\npass:{Environment.GetEnvironmentVariable("SMTP_PASS")}\n");
                 try
                 {
                     using (SmtpClient client = new SmtpClient()
                     {
                         UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential(Environment.GetEnvironmentVariable("SMTP_USER"), Environment.GetEnvironmentVariable("SMTP_PASS")),
+                        Credentials = new NetworkCredential("nstevens@nanick.org", "Tiger123$"),
                         Port = 587,
                         Host = "smtp.office365.com",
                         DeliveryMethod = SmtpDeliveryMethod.Network,
