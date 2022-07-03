@@ -564,7 +564,18 @@
                     {
                         twilio_params = streambody;
                     }
-                    TwilioCall twilio_call = TwilioObject(twilio_params);
+                    TwilioCall twilio_call = new TwilioCall();
+                    //= TwilioObject(twilio_params);
+                    try
+                    {
+                        twilio_call = TwilioObject(twilio_params);
+                    }
+                    catch (Exception e)
+                    {
+                        string jerror = JsonConvert.SerializeObject(e);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    }
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call status is {twilio_call.CallStatus}\n");
                     string greeting_uri = String.Empty;
                     switch (twilio_call.CallStatus)
