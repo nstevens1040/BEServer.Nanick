@@ -480,13 +480,6 @@
                 string item = Uri.UnescapeDataString(RequestBody.Split((Char)38)[i]);
                 string key = item.Split((Char)61)[0];
                 string val = String.Join((Char)61, item.Split((Char)61).Skip(1));
-                List<Char> spaces = new List<Char>();
-                Enumerable.Range(0, 16 - key.Length).ToList().ForEach(i =>
-                {
-                    spaces.Add((Char)32);
-                });
-                string sp = String.Join(String.Empty, spaces);
-                File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{key}{sp}{val}\n");
                 if (key != "AddOns")
                 {
                     dict.Add(key, val);
