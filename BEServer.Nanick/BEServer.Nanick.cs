@@ -565,6 +565,7 @@
                         twilio_params = streambody;
                     }
                     TwilioCall twilio_call = TwilioObject(twilio_params);
+                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call status is {twilio_call.CallStatus}\n");
                     string greeting_uri = String.Empty;
                     switch (twilio_call.CallStatus)
                     {
