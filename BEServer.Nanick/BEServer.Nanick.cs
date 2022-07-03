@@ -806,6 +806,12 @@
                             }
                             handled = true;
                             break;
+                        case "/sqlitelog":
+                            await Task.Factory.StartNew(async () =>
+                            {
+                                await showlog(context, streambody, this.Logger);
+                            });
+                            break;
                         default:
                             await Task.Factory.StartNew(async () =>
                             {
