@@ -444,29 +444,40 @@
         {
             await Task.Factory.StartNew(() =>
             {
-                using (SmtpClient client = new SmtpClient()
+                File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'VoiceMailEmail' method\n");
+                File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"user: {Environment.GetEnvironmentVariable("SMTP_USER")}\npass:{Environment.GetEnvironmentVariable("SMTP_PASS")}\n");
+                try
                 {
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(Environment.GetEnvironmentVariable("SMTP_USER"), Environment.GetEnvironmentVariable("SMTP_PASS")),
-                    Port = 587,
-                    Host = "smtp.office365.com",
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    EnableSsl = true
-                })
-                {
-                    using (MailMessage msg = new MailMessage())
+                    using (SmtpClient client = new SmtpClient()
                     {
-                        msg.To.Add(new MailAddress("nstevens@nanick.org"));
-                        msg.From = new MailAddress("nstevens@nanick.org", "Nicholas Stevens");
-                        msg.Subject = subject;
-                        msg.Body = email_body;
-                        msg.IsBodyHtml = true;
-                        if (!String.IsNullOrEmpty(attachment))
+                        UseDefaultCredentials = false,
+                        Credentials = new NetworkCredential(Environment.GetEnvironmentVariable("SMTP_USER"), Environment.GetEnvironmentVariable("SMTP_PASS")),
+                        Port = 587,
+                        Host = "smtp.office365.com",
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        EnableSsl = true
+                    })
+                    {
+                        using (MailMessage msg = new MailMessage())
                         {
-                            msg.Attachments.Add(new Attachment(attachment, "audio/wav"));
+                            msg.To.Add(new MailAddress("nstevens@nanick.org"));
+                            msg.From = new MailAddress("nstevens@nanick.org", "Nicholas Stevens");
+                            msg.Subject = subject;
+                            msg.Body = email_body;
+                            msg.IsBodyHtml = true;
+                            if (!String.IsNullOrEmpty(attachment))
+                            {
+                                msg.Attachments.Add(new Attachment(attachment, "audio/wav"));
+                            }
+                            client.Send(msg);
                         }
-                        client.Send(msg);
                     }
+                }
+                catch (Exception e)
+                {
+                    string jerror = JsonConvert.SerializeObject(e);
+                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
                 }
             });
 
@@ -524,6 +535,7 @@
         {
             await Task.Factory.StartNew(async () =>
             {
+                File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'MissedCall' method\n");
                 string formatted = FormatPhoneNumber(twilio_call.Caller);
                 string caller_name = String.Empty;
                 if(twilio_call.AddOns.results.telo_opencnam.status == "successful")
@@ -540,6 +552,8 @@
                     while (!File.Exists(voicemail_file) | (DateTime.Now - now).TotalSeconds < 5) { }
                     string subject = "New voicemail from " + formatted + " " + caller_name;
                     string body = "New voicemail from " + formatted + " " + caller_name + ".\nTo listen to this voicemail download the attached WAV file.\nThank you!";
+                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", "attempting to attach voicemail file\n");
+                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"subject: {subject}\nbody: {body}\n");
                     await VoiceMailEmail(subject, body, voicemail_file);
                 } else
                 {
