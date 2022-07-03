@@ -19,6 +19,77 @@
     using System.Data.SQLite;
     using HtmlAgilityPack;
     using System.Data;
+    using System.Text.RegularExpressions;
+    using System.Net.Mail;
+    public class TwilioCall
+    {
+        public TwilioCall()
+        {
+        }
+        public string Digits { get; set; }
+        public string RecordingUrl { get; set; }
+        public string RecordingSid { get; set; }
+        public string RecordingDuration { get; set; }
+        public string CallbackSource { get; set; }
+        public string CallDuration { get; set; }
+        public string Duration { get; set; }
+        public string SequenceNumber { get; set; }
+        public string Timestamp { get; set; }
+        public string Called { get; set; }
+        public string ToState { get; set; }
+        public string CallerCountry { get; set; }
+        public string Direction { get; set; }
+        public string CalledVia { get; set; }
+        public string CallerState { get; set; }
+        public string ToZip { get; set; }
+        public string CallSid { get; set; }
+        public string To { get; set; }
+        public string CallerName { get; set; }
+        public string CallerZip { get; set; }
+        public string ToCountry { get; set; }
+        public string CallToken { get; set; }
+        public string ApiVersion { get; set; }
+        public string CalledZip { get; set; }
+        public AddOns AddOns { get; set; }
+        public string CallStatus { get; set; }
+        public string CalledCity { get; set; }
+        public string From { get; set; }
+        public string AccountSid { get; set; }
+        public string CalledCountry { get; set; }
+        public string CallerCity { get; set; }
+        public string Caller { get; set; }
+        public string FromCountry { get; set; }
+        public string ToCity { get; set; }
+        public string FromCity { get; set; }
+        public string CalledState { get; set; }
+        public string ForwardedFrom { get; set; }
+        public string FromZip { get; set; }
+        public string FromState { get; set; }
+    }
+    public class Result
+    {
+        public string name { get; set; }
+        public string number { get; set; }
+    }
+    public class Results
+    {
+        public TeloOpencnam telo_opencnam { get; set; }
+    }
+    public class AddOns
+    {
+        public string status { get; set; }
+        public object message { get; set; }
+        public object code { get; set; }
+        public Results results { get; set; }
+    }
+    public class TeloOpencnam
+    {
+        public string request_sid { get; set; }
+        public string status { get; set; }
+        public object message { get; set; }
+        public object code { get; set; }
+        public Result result { get; set; }
+    }
     public class HttpServer
     {
         public Logger Logger = new Logger();
@@ -369,6 +440,169 @@
         //         message.Dispose();
         //     });
         // }
+        public static async Task VoiceMailEmail(string subject, string email_body, string attachment = null)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                using (SmtpClient client = new SmtpClient()
+                {
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(Environment.GetEnvironmentVariable("SMTP_USER"), Environment.GetEnvironmentVariable("SMTP_PASS")),
+                    Port = 587,
+                    Host = "smtp.office365.com",
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    EnableSsl = true
+                })
+                {
+                    using (MailMessage msg = new MailMessage())
+                    {
+                        msg.To.Add(new MailAddress("nstevens@nanick.org"));
+                        msg.From = new MailAddress("nstevens@nanick.org", "Nicholas Stevens");
+                        msg.Subject = subject;
+                        msg.Body = email_body;
+                        msg.IsBodyHtml = true;
+                        if (!String.IsNullOrEmpty(attachment))
+                        {
+                            msg.Attachments.Add(new Attachment(attachment, "audio/wav"));
+                        }
+                        client.Send(msg);
+                    }
+                }
+            });
+
+        }
+        public static TwilioCall TwilioObject(string RequestBody)
+        {
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            string addons_json = String.Empty;
+            for (int i = 0; i < RequestBody.Split((Char)38).Count(); i++)
+            {
+                string item = Uri.UnescapeDataString(RequestBody.Split((Char)38)[i]);
+                string key = item.Split((Char)61)[0];
+                string val = String.Join((Char)61, item.Split((Char)61).Skip(1));
+                if(key != "AddOns")
+                {
+                    dict.Add(key, val);
+                } else
+                {
+                    addons_json = val;
+                }
+            }
+            AddOns addons = JsonConvert.DeserializeObject<AddOns>(addons_json);
+            string twilio_json = JsonConvert.SerializeObject(dict, Formatting.Indented);
+            TwilioCall twilio_call = JsonConvert.DeserializeObject<TwilioCall>(twilio_json);
+            twilio_call.AddOns = addons;
+            return twilio_call;
+        }
+        public static string FormatPhoneNumber(string caller)
+        {
+            Regex r = new Regex(@"(\+\d)(\d{3})(\d{3})(\d{4})");
+            GroupCollection grps = r.Match(caller).Groups;
+            string formatted = grps[1].Value + " (" + grps[2].Value + ") " + grps[3].Value + "-" + grps[4].Value;
+            return formatted.Trim();
+        }
+        public static Int32 GetUnixEpoch()
+        {
+            return Convert.ToInt32((DateTime.Now - DateTime.Parse("1970-01-01")).TotalSeconds);
+        }
+        public static string DownloadVoiceMail(TwilioCall twilio_call)
+        {
+            string voice_mail = $"{home_}/.TEMP/VOICEMAIL/{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
+            using (WebClient wc = new WebClient())
+            {
+                string filepath = $"{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}";
+                wc.DownloadFile(
+                    twilio_call.RecordingUrl,
+                    filepath
+                );
+                return filepath;
+            }
+        }
+        public static async Task MissedCall(TwilioCall twilio_call,bool include_recording)
+        {
+            await Task.Factory.StartNew(async () =>
+            {
+                string formatted = FormatPhoneNumber(twilio_call.Caller);
+                string caller_name = String.Empty;
+                if(twilio_call.AddOns.results.telo_opencnam.status == "successful")
+                {
+                    caller_name = twilio_call.AddOns.results.telo_opencnam.result.name.Replace((Char)43, (Char)32);
+                } else
+                {
+                    caller_name = twilio_call.CallerName.Replace((Char)43, (Char)32);
+                }
+                if (include_recording)
+                {
+                    string voicemail_file = DownloadVoiceMail(twilio_call);
+                    string subject = "New voicemail from " + formatted + " " + caller_name;
+                    string body = "New voicemail from " + formatted + " " + caller_name + ".\nTo listen to this voicemail download the attached WAV file.\nThank you!";
+                    await VoiceMailEmail(subject, body, voicemail_file);
+                } else
+                {
+                    string subject = "Missed call from " + formatted + " " + caller_name;
+                    string body = "You've missed a call from " + formatted + " " + caller_name + ".";
+                    await VoiceMailEmail(subject, body);
+                }
+            });
+        }
+        public static async Task voice(HttpListenerContext context, string streambody)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                int timeOfDay = DateTime.Now.TimeOfDay.Hours;
+                string twilio_params = String.Empty;
+                if (String.IsNullOrEmpty(streambody))
+                {
+                    twilio_params = context.Request.Url.Query.Substring(1);
+                } else
+                {
+                    twilio_params = streambody;
+                }
+                TwilioCall twilio_call = TwilioObject(twilio_params);
+                string greeting_uri = String.Empty;
+                switch (twilio_call.CallStatus)
+                {
+                    case "ringing":
+                        switch (timeOfDay)
+                        {
+                            case < 12:
+                                greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Morning.mp3";
+                                break;
+                            case < 18:
+                                greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Afternoon.mp3";
+                                break;
+                            case <= 24:
+                                greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Evening.mp3";
+                                break;
+                        }
+                        string xml1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n     <Play>" + greeting_uri + "</Play>\n     <Record timeout=\"120\" playBeep=\"true\"></Record>\n    <Hangup></Hangup>\n</Response>\n";
+                        byte[] twbuffe1 = Encoding.UTF8.GetBytes(xml1);
+                        context.Response.ContentType = "text/xml";
+                        context.Response.ContentEncoding = Encoding.UTF8;
+                        context.Response.ContentLength64 = twbuffe1.Length;
+                        context.Response.OutputStream.Write(twbuffe1, 0, twbuffe1.Length);
+                        context.Response.StatusCode = 200;
+                        context.Response.StatusDescription = "Ok";
+                        context.Response.Close();
+                        break;
+                    case "completed":
+                        string xml2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n    <Hangup></Hangup>\n</Response>";
+                        byte[] twbuffe2 = Encoding.UTF8.GetBytes(xml2);
+                        context.Response.ContentType = "text/xml";
+                        context.Response.ContentEncoding = Encoding.UTF8;
+                        context.Response.ContentLength64 = twbuffe2.Length;
+                        context.Response.OutputStream.Write(twbuffe2, 0, twbuffe2.Length);
+                        context.Response.StatusCode = 200;
+                        context.Response.StatusDescription = "Ok";
+                        context.Response.Close();
+                        break;
+                    case "in-progress":
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
         public static async Task geopost(HttpListenerContext context, string streambody)
         {
             await Task.Run(() =>
