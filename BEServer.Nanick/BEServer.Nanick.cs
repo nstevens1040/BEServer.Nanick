@@ -499,12 +499,14 @@
                     addons_json = val;
                 }
             }
-            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{addons_json}\n");
+            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"addons_json: {addons_json}\n");
             AddOns addons = JsonConvert.DeserializeObject<AddOns>(addons_json);
             string twilio_json = JsonConvert.SerializeObject(dict, Formatting.Indented);
             File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{twilio_json}\n");
             TwilioCall twilio_call = JsonConvert.DeserializeObject<TwilioCall>(twilio_json);
             twilio_call.AddOns = addons;
+            string full_twilio_json = JsonConvert.SerializeObject(twilio_call, Formatting.Indented);
+            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{full_twilio_json}\n");
             return twilio_call;
         }
         public static string FormatPhoneNumber(string caller)
