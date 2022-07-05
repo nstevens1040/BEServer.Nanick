@@ -523,15 +523,25 @@
         public static string DownloadVoiceMail(TwilioCall twilio_call)
         {
             string voice_mail = $"{home_}/.TEMP/VOICEMAIL/{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
-            using (WebClient wc = new WebClient())
+            try
             {
-                string filepath = $"{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
-                wc.DownloadFile(
-                    twilio_call.RecordingUrl,
-                    filepath
-                );
-                return filepath;
+                using (WebClient wc = new WebClient())
+                {
+                    wc.DownloadFile(
+                        twilio_call.RecordingUrl,
+                        voice_mail
+                    );
+                    return voice_mail;
+                }
             }
+            catch (Exception e)
+            {
+                string jerror = JsonConvert.SerializeObject(e);
+                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+            }
+            return voice_mail;
+
         }
         public static async Task MissedCall(TwilioCall twilio_call,bool include_recording)
         {
@@ -548,7 +558,7 @@
                 {
                     caller_name = twilio_call.CallerName.Replace((Char)43, (Char)32);
                 }
-                File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call from:{formatted}\ncall id:{caller_name}");
+                File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call from:{formatted}\ncall id:{caller_name}\n");
                 if (include_recording)
                 {
                     string voicemail_file = DownloadVoiceMail(twilio_call);
