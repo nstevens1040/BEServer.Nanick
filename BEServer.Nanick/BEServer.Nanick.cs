@@ -548,6 +548,7 @@
                 {
                     caller_name = twilio_call.CallerName.Replace((Char)43, (Char)32);
                 }
+                File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call from:{formatted}\ncall id:{caller_name}");
                 if (include_recording)
                 {
                     string voicemail_file = DownloadVoiceMail(twilio_call);
@@ -562,6 +563,7 @@
                 {
                     string subject = "Missed call from " + formatted + " " + caller_name;
                     string body = "You've missed a call from " + formatted + " " + caller_name + ".";
+                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"sending email:\n    subject:{subject}\n    body:\n{body}\n");
                     await VoiceMailEmail(subject, body);
                 }
             });
