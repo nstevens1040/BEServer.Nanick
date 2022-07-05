@@ -447,6 +447,22 @@
                 await Task.Factory.StartNew(() =>
                 {
                     string voicemail_file = $"{home_}/.TEMP/VOICEMAIL/{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
+                    RetObject r = null;
+                    try
+                    {
+                        r = Execute.HttpRequest.Send(twilio_call.RecordingUrl, HttpMethod.Head);
+                    }
+                    catch
+                    {
+                        while(!r.HttpResponseMessage.IsSuccessStatusCode)
+                        {
+                            try
+                            {
+                                r = Execute.HttpRequest.Send(twilio_call.RecordingUrl, HttpMethod.Head);
+                            }
+                            catch { }
+                        }
+                    }
                     try
                     {
                         using (WebClient wc = new WebClient())
