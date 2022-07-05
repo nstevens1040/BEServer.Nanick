@@ -463,7 +463,6 @@
                         File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
                         File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
                     }
-                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'VoiceMailEmail' method\n");
                     DateTime now = DateTime.Now;
                     while (!File.Exists(voicemail_file) | (DateTime.Now - now).TotalSeconds < 5) { }
                     try
@@ -575,21 +574,12 @@
         {
             return Convert.ToInt32((DateTime.Now - DateTime.Parse("1970-01-01")).TotalSeconds);
         }
-        public static async Task MissedCall(TwilioCall twilio_call,bool include_recording)
+        public static async Task MissedCall(TwilioCall twilio_call,bool include_recording, string caller_name)
         {
             await Task.Factory.StartNew(async () =>
             {
                 File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'MissedCall' method\n");
                 string formatted = FormatPhoneNumber(twilio_call.Caller);
-                string caller_name = String.Empty;
-                if (twilio_call.AddOns.results.telo_opencnam.status == "successful")
-                {
-                    caller_name = twilio_call.AddOns.results.telo_opencnam.result.name.Replace((Char)43, (Char)32);
-                }
-                else
-                {
-                    caller_name = twilio_call.CallerName.Replace((Char)43, (Char)32);
-                }
                 File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call from:{formatted}\ncall id:{caller_name}\n");
                 if (include_recording)
                 {
@@ -614,7 +604,6 @@
             {
                 await Task.Factory.StartNew(async () =>
                 {
-                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into /voice endpoint\n");
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"streambody: {streambody}\n");
                     int timeOfDay = DateTime.Now.TimeOfDay.Hours;
                     string twilio_params = String.Empty;
@@ -626,7 +615,6 @@
                     {
                         twilio_params = streambody;
                     }
-                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{twilio_params}");
                     TwilioCall twilio_call = new TwilioCall();
                     //= TwilioObject(twilio_params);
                     try
@@ -640,13 +628,26 @@
                         File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
                     }
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call status is {twilio_call.CallStatus}\n");
+                    int request_number = 0;
+                    if(!String.IsNullOrEmpty(twilio_call.CallToken))
+                    {
+                        request_number = 1;
+                    } else
+                    {
+                        if(!String.IsNullOrEmpty(twilio_call.Digits))
+                        {
+                            request_number = 2;
+                        } else
+                        {
+                            request_number = 3;
+                        }
+                    }
                     string greeting_uri = String.Empty;
                     string caller_name = String.Empty;
-                    switch (twilio_call.CallStatus)
+                    switch (request_number)
                     {
-                        case "ringing":
-
-                            if (twilio_call.AddOns.results.telo_opencnam.status == "successful")
+                        case 1:
+                            if(twilio_call.AddOns != null)
                             {
                                 caller_name = twilio_call.AddOns.results.telo_opencnam.result.name.Replace((Char)43, (Char)32);
                             }
@@ -654,7 +655,6 @@
                             {
                                 caller_name = twilio_call.CallerName.Replace((Char)43, (Char)32);
                             }
-                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"ringing\"\n");
                             switch (timeOfDay)
                             {
                                 case < 12:
@@ -677,9 +677,9 @@
                             context.Response.StatusCode = 200;
                             context.Response.StatusDescription = "Ok";
                             context.Response.Close();
-                            await MissedCall(twilio_call, false);
+                            await MissedCall(twilio_call, false, caller_name);
                             break;
-                        case "completed":
+                        case 2:
                             File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"completed\"\n");
                             string xml2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n    <Hangup></Hangup>\n</Response>";
                             byte[] twbuffe2 = Encoding.UTF8.GetBytes(xml2);
@@ -690,9 +690,9 @@
                             context.Response.StatusCode = 200;
                             context.Response.StatusDescription = "Ok";
                             context.Response.Close();
-                            await MissedCall(twilio_call, true);
+                            await MissedCall(twilio_call, true, caller_name);
                             break;
-                        case "in-progress":
+                        case 3:
                             File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"in-progress\"\n");
                             break;
                         default:
