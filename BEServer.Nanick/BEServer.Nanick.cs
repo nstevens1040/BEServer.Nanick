@@ -440,47 +440,102 @@
         //         message.Dispose();
         //     });
         // }
-        public static async Task VoiceMailEmail(string subject, string email_body, string attachment = null)
+        public static async Task VoiceMailEmail(string subject, string email_body, TwilioCall twilio_call)
         {
-            await Task.Factory.StartNew(() =>
+            if (!String.IsNullOrEmpty(twilio_call.RecordingUrl))
             {
-                File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'VoiceMailEmail' method\n");
-                //File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"user: {Environment.GetEnvironmentVariable("SMTP_USER")}\npass:{Environment.GetEnvironmentVariable("SMTP_PASS")}\n");
-                try
+                await Task.Factory.StartNew(() =>
                 {
-                    using (SmtpClient client = new SmtpClient()
+                    string voicemail_file = $"{home_}/.TEMP/VOICEMAIL/{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
+                    try
                     {
-                        UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential("nstevens@nanick.org", "Tiger123$"),
-                        Port = 587,
-                        Host = "smtp.office365.com",
-                        DeliveryMethod = SmtpDeliveryMethod.Network,
-                        EnableSsl = true
-                    })
-                    {
-                        using (MailMessage msg = new MailMessage())
+                        using (WebClient wc = new WebClient())
                         {
-                            msg.To.Add(new MailAddress("nstevens@nanick.org"));
-                            msg.From = new MailAddress("nstevens@nanick.org", "Nicholas Stevens");
-                            msg.Subject = subject;
-                            msg.Body = email_body;
-                            msg.IsBodyHtml = true;
-                            if (!String.IsNullOrEmpty(attachment))
-                            {
-                                msg.Attachments.Add(new Attachment(attachment, "audio/wav"));
-                            }
-                            client.Send(msg);
+                            wc.DownloadFile(
+                                twilio_call.RecordingUrl,
+                                voicemail_file
+                            );
                         }
                     }
-                }
-                catch (Exception e)
+                    catch (Exception e)
+                    {
+                        string jerror = JsonConvert.SerializeObject(e);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    }
+                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'VoiceMailEmail' method\n");
+                    DateTime now = DateTime.Now;
+                    while (!File.Exists(voicemail_file) | (DateTime.Now - now).TotalSeconds < 5) { }
+                    try
+                    {
+                        using (SmtpClient client = new SmtpClient()
+                        {
+                            UseDefaultCredentials = false,
+                            Credentials = new NetworkCredential("nstevens@nanick.org", "Tiger123$"),
+                            Port = 587,
+                            Host = "smtp.office365.com",
+                            DeliveryMethod = SmtpDeliveryMethod.Network,
+                            EnableSsl = true
+                        })
+                        {
+                            using (MailMessage msg = new MailMessage())
+                            {
+                                msg.To.Add(new MailAddress("nstevens@nanick.org"));
+                                msg.From = new MailAddress("nstevens@nanick.org", "Nicholas Stevens");
+                                msg.Subject = subject;
+                                msg.Body = email_body;
+                                msg.IsBodyHtml = true;
+                                if (!String.IsNullOrEmpty(voicemail_file))
+                                {
+                                    msg.Attachments.Add(new Attachment(voicemail_file, "audio/wav"));
+                                }
+                                client.Send(msg);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        string jerror = JsonConvert.SerializeObject(e);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    }
+                });
+            }
+            else
+            {
+                await Task.Factory.StartNew(() =>
                 {
-                    string jerror = JsonConvert.SerializeObject(e);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
-                }
-            });
-
+                    try
+                    {
+                        using (SmtpClient client = new SmtpClient()
+                        {
+                            UseDefaultCredentials = false,
+                            Credentials = new NetworkCredential("nstevens@nanick.org", "Tiger123$"),
+                            Port = 587,
+                            Host = "smtp.office365.com",
+                            DeliveryMethod = SmtpDeliveryMethod.Network,
+                            EnableSsl = true
+                        })
+                        {
+                            using (MailMessage msg = new MailMessage())
+                            {
+                                msg.To.Add(new MailAddress("nstevens@nanick.org"));
+                                msg.From = new MailAddress("nstevens@nanick.org", "Nicholas Stevens");
+                                msg.Subject = subject;
+                                msg.Body = email_body;
+                                msg.IsBodyHtml = true;
+                                client.Send(msg);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        string jerror = JsonConvert.SerializeObject(e);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    }
+                });
+            }
         }
         public static TwilioCall TwilioObject(string RequestBody)
         {
@@ -520,29 +575,6 @@
         {
             return Convert.ToInt32((DateTime.Now - DateTime.Parse("1970-01-01")).TotalSeconds);
         }
-        public static string DownloadVoiceMail(TwilioCall twilio_call)
-        {
-            string voice_mail = $"{home_}/.TEMP/VOICEMAIL/{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
-            try
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    wc.DownloadFile(
-                        twilio_call.RecordingUrl,
-                        voice_mail
-                    );
-                    return voice_mail;
-                }
-            }
-            catch (Exception e)
-            {
-                string jerror = JsonConvert.SerializeObject(e);
-                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
-            }
-            return voice_mail;
-
-        }
         public static async Task MissedCall(TwilioCall twilio_call,bool include_recording)
         {
             await Task.Factory.StartNew(async () =>
@@ -561,20 +593,18 @@
                 File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call from:{formatted}\ncall id:{caller_name}\n");
                 if (include_recording)
                 {
-                    string voicemail_file = DownloadVoiceMail(twilio_call);
                     DateTime now = DateTime.Now;
-                    while (!File.Exists(voicemail_file) | (DateTime.Now - now).TotalSeconds < 5) { }
                     string subject = "New voicemail from " + formatted + " " + caller_name;
                     string body = "New voicemail from " + formatted + " " + caller_name + ".\nTo listen to this voicemail download the attached WAV file.\nThank you!";
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", "attempting to attach voicemail file\n");
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"subject: {subject}\nbody: {body}\n");
-                    await VoiceMailEmail(subject, body, voicemail_file);
+                    await VoiceMailEmail(subject, body, twilio_call);
                 } else
                 {
                     string subject = "Missed call from " + formatted + " " + caller_name;
                     string body = "You've missed a call from " + formatted + " " + caller_name + ".";
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"sending email:\n    subject:{subject}\n    body:\n{body}\n");
-                    await VoiceMailEmail(subject, body);
+                    await VoiceMailEmail(subject, body, twilio_call);
                 }
             });
         }
