@@ -710,6 +710,16 @@
                             break;
                         case 3:
                             File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"in-progress\"\n");
+                            string xml3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n    <Hangup></Hangup>\n</Response>";
+                            byte[] twbuffe3 = Encoding.UTF8.GetBytes(xml3);
+                            context.Response.ContentType = "text/xml";
+                            context.Response.ContentEncoding = Encoding.UTF8;
+                            context.Response.ContentLength64 = twbuffe3.Length;
+                            context.Response.OutputStream.Write(twbuffe3, 0, twbuffe3.Length);
+                            context.Response.StatusCode = 200;
+                            context.Response.StatusDescription = "Ok";
+                            context.Response.Close();
+                            await MissedCall(twilio_call, false, caller_name);
                             break;
                         default:
                             File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"default\"\n");
