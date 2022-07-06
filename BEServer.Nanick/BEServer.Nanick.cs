@@ -454,7 +454,7 @@
                     }
                     catch
                     {
-                        while(r.HttpResponseMessage.StatusCode != HttpStatusCode.NotFound)
+                        while(r.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
                         {
                             try
                             {
