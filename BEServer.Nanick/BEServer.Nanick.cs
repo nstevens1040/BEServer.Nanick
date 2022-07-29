@@ -454,13 +454,16 @@
                     }
                     catch
                     {
-                        while(r.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                        while(r.HttpResponseMessage.StatusCode != HttpStatusCode.OK)
                         {
                             try
                             {
                                 r = Execute.HttpRequest.Send(twilio_call.RecordingUrl, HttpMethod.Head);
                             }
-                            catch { }
+                            catch
+                            {
+                                Thread.Sleep(500);
+                            }
                         }
                     }
                     try
