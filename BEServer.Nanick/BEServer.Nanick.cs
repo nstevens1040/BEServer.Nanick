@@ -530,7 +530,7 @@
                             UseDefaultCredentials = false,
                             Credentials = new NetworkCredential("vmail@nanick.org", "2Bch@ng3d"),
                             Port = 587,
-                            Host = "mail.nanicklocal.hopto.org",
+                            Host = "mail.nanick.org",
                             DeliveryMethod = SmtpDeliveryMethod.Network,
                             EnableSsl = true
                         })
