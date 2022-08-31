@@ -528,9 +528,9 @@
                         using (SmtpClient client = new SmtpClient()
                         {
                             UseDefaultCredentials = false,
-                            Credentials = new NetworkCredential("nstevens@nanick.org", "Tiger123$"),
+                            Credentials = new NetworkCredential("vmail@nanick.org", "2Bch@ng3d"),
                             Port = 587,
-                            Host = "smtp.office365.com",
+                            Host = "mail.nanicklocal.hopto.org",
                             DeliveryMethod = SmtpDeliveryMethod.Network,
                             EnableSsl = true
                         })
@@ -538,7 +538,7 @@
                             using (MailMessage msg = new MailMessage())
                             {
                                 msg.To.Add(new MailAddress("nstevens@nanick.org"));
-                                msg.From = new MailAddress("nstevens@nanick.org", "Nicholas Stevens");
+                                msg.From = new MailAddress("vmail@nanick.org", "Voice Mail");
                                 msg.Subject = subject;
                                 msg.Body = email_body;
                                 msg.IsBodyHtml = true;
