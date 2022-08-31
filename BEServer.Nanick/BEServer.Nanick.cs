@@ -469,7 +469,7 @@
                 {
                     using (SmtpClient client = new SmtpClient())
                     {
-                        client.Connect("mail.nanicklocal.hopto.org", 587, SecureSocketOptions.SslOnConnect);
+                        client.Connect("mail.nanicklocal.hopto.org", 587, SecureSocketOptions.StartTls);
                         client.Authenticate("vmail@nanick.org", "2Bch@ng3d");
                         using (MimeMessage msg = new MimeMessage() { Subject = subject })
                         {
@@ -506,7 +506,7 @@
                 {
                     using (SmtpClient client = new SmtpClient())
                     {
-                        client.Connect("mail.nanicklocal.hopto.org", 587, SecureSocketOptions.SslOnConnect);
+                        client.Connect("mail.nanicklocal.hopto.org", 587, SecureSocketOptions.StartTls);
                         client.Authenticate("vmail@nanick.org", "2Bch@ng3d");
                         using (MimeMessage msg = new MimeMessage() { Subject = subject })
                         {
