@@ -9,7 +9,6 @@
   <ItemGroup>
     <None Remove="lib\Execute.HttpRequest.Core.dll" />
     <None Remove="lib\HtmlAgilityPack.dll" />
-    <None Remove="lib\MimeKit.dll" />
     <None Remove="lib\Newtonsoft.Json.dll" />
     <None Remove="lib\System.Security.Permissions.dll" />
   </ItemGroup>
@@ -17,12 +16,12 @@
   <ItemGroup>
     <EmbeddedResource Include="lib\Execute.HttpRequest.Core.dll" />
     <EmbeddedResource Include="lib\HtmlAgilityPack.dll" />
-    <EmbeddedResource Include="lib\MimeKit.dll" />
     <EmbeddedResource Include="lib\Newtonsoft.Json.dll" />
     <EmbeddedResource Include="lib\System.Security.Permissions.dll" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="3.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
   </ItemGroup>
 
@@ -33,10 +32,6 @@
     </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>lib\HtmlAgilityPack.dll</HintPath>
-      <CopyLocal>False</CopyLocal>
-    </Reference>
-    <Reference Include="MimeKit">
-      <HintPath>lib\MimeKit.dll</HintPath>
       <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="Newtonsoft.Json">
