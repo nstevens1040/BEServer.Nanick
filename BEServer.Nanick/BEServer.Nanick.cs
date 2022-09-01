@@ -451,6 +451,7 @@
                 {
                     using (WebClient wc = new WebClient())
                     {
+                        Thread.Sleep(500);
                         wc.DownloadFile(
                             twilio_call.RecordingUrl,
                             voicemail_file
