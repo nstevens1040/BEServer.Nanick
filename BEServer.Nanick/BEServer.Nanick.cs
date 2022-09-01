@@ -608,17 +608,33 @@
                         twilio_params = streambody;
                     }
                     TwilioCall twilio_call = new TwilioCall();
+                    if(new Regex(@"x-www-form-urlencoded").Match(context.Request.ContentType).Success)
+                    {
+                        try
+                        {
+                            twilio_call = TwilioObject(twilio_params);
+                        }
+                        catch (Exception e)
+                        {
+                            string jerror = JsonConvert.SerializeObject(e);
+                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                        }
+                    } else
+                    {
+                        try
+                        {
+                            twilio_call = JsonConvert.DeserializeObject<TwilioCall>(twilio_params);
+                        }
+                        catch (Exception e)
+                        {
+                            string jerror = JsonConvert.SerializeObject(e);
+                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                        }
+                    }
                     //= TwilioObject(twilio_params);
-                    try
-                    {
-                        twilio_call = TwilioObject(twilio_params);
-                    }
-                    catch (Exception e)
-                    {
-                        string jerror = JsonConvert.SerializeObject(e);
-                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
-                    }
+
                     File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call status is {twilio_call.CallStatus}\n");
                     int request_number = 0;
                     if(!String.IsNullOrEmpty(twilio_call.CallToken))
