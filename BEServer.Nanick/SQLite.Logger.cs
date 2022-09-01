@@ -52,6 +52,16 @@
             }
             return dict;
         }
+        public string EscapeDblQuot(string body)
+        {
+            string input = String.Empty;
+            Regex dblquot = new Regex("\"");
+            if (!String.IsNullOrEmpty(body))
+            {
+                input = dblquot.Replace(body, "\\\"");
+            }
+            return input;
+        }
         public Context__(HttpListenerRequest request,string streambody=null)
         {
             this.AcceptTypes = request.AcceptTypes;
@@ -62,7 +72,7 @@
             this.HasEntityBody = request.HasEntityBody;
             this.Headers = ConvertHeaders(request.Headers);
             this.HttpMethod = request.HttpMethod;
-            this.InputStream = streambody;
+            this.InputStream = EscapeDblQuot(streambody);
             this.IsAuthenticated = request.IsAuthenticated;
             this.IsLocal = request.IsLocal;
             this.IsSecureConnection = request.IsSecureConnection;
@@ -71,7 +81,7 @@
             this.LocalEndPoint = request.LocalEndPoint.Address.ToString() + ':' + request.LocalEndPoint.Port;
             this.ProtocolVersion = request.ProtocolVersion;
             this.QueryString = ConvertHeaders(request.QueryString);
-            this.RawUrl = request.RawUrl;
+            this.RawUrl = Logger.apos.Replace(request.RawUrl, String.Empty);
             this.RemoteEndPoint = request.RemoteEndPoint.Address.ToString() + ':' + request.RemoteEndPoint.Port;
             this.RequestTraceIdentifier = request.RequestTraceIdentifier;
             this.ServiceName = request.ServiceName;
@@ -89,6 +99,8 @@
         public Logger()
         {
         }
+        public static Regex apos = new Regex("'");
+        public static Regex dblquot = new Regex("\"");
         public static string home_ = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("HOME")) ? Environment.GetEnvironmentVariable("USERPROFILE") : Environment.GetEnvironmentVariable("HOME");
         public SQLiteConnection sqliteConnection;
         public SQLiteCommand sqliteCommand;
