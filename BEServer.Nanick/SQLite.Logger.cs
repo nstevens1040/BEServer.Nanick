@@ -46,9 +46,12 @@
         public Dictionary<string, string> ConvertHeaders(System.Collections.Specialized.NameValueCollection nvc)
         {
             Dictionary<string, string> dict = new Dictionary<string, string>();
-            foreach (string key in nvc.Keys)
+            if(nvc.Keys.Count > 0)
             {
-                dict.Add(key, nvc[key]);
+                foreach (string key in nvc.Keys)
+                {
+                    dict.Add(key, nvc[key]);
+                }
             }
             return dict;
         }
