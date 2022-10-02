@@ -734,6 +734,76 @@
                 context.Response.OutputStream.Close();
             }
         }
+        public static async Task upwork(HttpListenerContext context)
+        {
+            await Task.Run(() =>
+            {
+                byte[] htmlUpwork = Encoding.UTF8.GetBytes("<!DOCTYPE html><head><meta charset=\"utf-8\"></head><body><div><h1>Under Construction</h1></div></body></html>");
+                context.Response.ContentEncoding = Encoding.UTF8;
+                context.Response.ContentType = "text/html";
+                context.Response.ContentLength64 = htmlUpwork.Length;
+                context.Response.OutputStream.Write(htmlUpwork, 0, htmlUpwork.Length);
+                context.Response.StatusCode = 200;
+                context.Response.StatusDescription = "Ok";
+                context.Response.OutputStream.Close();
+
+                // string oauth_token_ = String.Empty;
+                // string oauth_verifier = String.Empty;
+                // bool access_token = true;
+                // string oauth_secret = String.Empty;
+                // string user_id = String.Empty;
+                // string screen_name = String.Empty;
+                // if (context.Request.Url.PathAndQuery.Equals(@"/upwork"))
+                // {
+                //     access_token = false;
+                // }
+                // if (access_token)
+                // {
+                //     context.Request.Url.PathAndQuery.Split((Char)63).ToList()[1].Split((Char)38).ToList().ForEach((i) =>
+                //     {
+                //         string key = i.Split((Char)61).ToList()[0];
+                //         string value = i.Split((Char)61).ToList()[1];
+                //         switch (key)
+                //         {
+                //             case "oauth_token":
+                //                 oauth_token_ = value;
+                //                 break;
+                //             case "oauth_verifier":
+                //                 oauth_verifier = value;
+                //                 break;
+                //         }
+                //     });
+                //     string VerifierUri = "https://api.twitter.com/oauth/access_token?oauth_token=" + oauth_token_ + "&oauth_verifier=" + oauth_verifier;
+                //     string twformhtml = new WebClient().DownloadString(VerifierUri);
+                //     //string response_html = "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"utf-8\"/>\n        <meta name=\"viewport\" content=\"initial-scale=1,width=device-width\"/>\n    </head>\n    <body>\n        <div>\n            <pre>" + twformhtml + "</pre>\n        </div>\n    </body>\n</html>";
+                //     //string twformhtml = "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"utf-8\"/>\n        <meta name=\"viewport\" content=\"intial-scale=1,width=device-wdith\"/>\n        <script type=\"application/javascript\">\n            document.addEventListener(\"DOMContentLoaded\",()=>\n            {\n                document.getElementById(\"twform\").submit();\n            });\n        </script>\n    </head>\n    <body>\n        <form id=\"twform\" method=\"post\" action=\"https://api.twitter.com/oauth/access_token?oauth_token=" + oauth_token_ + "&oauth_verifier=" + oauth_verifier + "\">\n        </form>\n    </body>\n</html>";
+                //     byte[] twformbytes = Encoding.UTF8.GetBytes(twformhtml);
+                //     context.Response.ContentEncoding = Encoding.UTF8;
+                //     context.Response.ContentType = "text/html";
+                //     context.Response.ContentLength64 = twformbytes.Length;
+                //     context.Response.OutputStream.Write(twformbytes, 0, twformbytes.Length);
+                //     context.Response.StatusCode = 200;
+                //     context.Response.StatusDescription = "Ok";
+                //     context.Response.OutputStream.Close();
+                //     //context.Response.AddHeader("Location", uri);
+                //     //context.Response.StatusCode = 307;
+                //     //context.Response.StatusDescription = "Temporary Redirect";
+                //     //context.Response.Redirect(uri);
+                //     //context.Response.Close();
+                // }
+                // else
+                // {
+                //     byte[] htmlUpwork = Encoding.UTF8.GetBytes("<!DOCTYPE html><head><meta charset=\"utf-8\"></head><body><div><h1>Under Construction</h1></div></body></html>");
+                //     context.Response.ContentEncoding = Encoding.UTF8;
+                //     context.Response.ContentType = "text/html";
+                //     context.Response.ContentLength64 = htmlUpwork.Length;
+                //     context.Response.OutputStream.Write(htmlUpwork, 0, htmlUpwork.Length);
+                //     context.Response.StatusCode = 200;
+                //     context.Response.StatusDescription = "Ok";
+                //     context.Response.OutputStream.Close();
+                // }
+            });
+        }
         public static async Task geopost(HttpListenerContext context, string streambody)
         {
             await Task.Run(() =>
