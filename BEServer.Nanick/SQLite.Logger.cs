@@ -55,6 +55,10 @@
             }
             return dict;
         }
+        public static string RemoveDoubleDblQuote(string value)
+        {
+            return (new Regex("\"User(.*)Agent\": (\")(\")(.*)(\")(\")").Replace(value, "\"User$1Agent\": \"$4\""));
+        }
         public string EscapeDblQuot(string body)
         {
             string input = String.Empty;

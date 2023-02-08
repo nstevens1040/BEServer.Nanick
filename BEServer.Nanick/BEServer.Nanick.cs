@@ -240,7 +240,8 @@
                                         cells[i] = value;
                                         break;
                                     case 1:
-                                        req_obj = JsonConvert.DeserializeObject<Context__>($"{row[properties[4]]}");
+                                        string request_json = Context__.RemoveDoubleDblQuote($"{row[properties[4]]}");
+                                        req_obj = JsonConvert.DeserializeObject<Context__>(request_json);
                                         if (req_obj.Headers.ContainsKey("Forwarded"))
                                         {
                                             value = "<td class=\"sourceip\">" + $"{req_obj.Headers["Forwarded"]}" + "</td>";
