@@ -954,7 +954,7 @@
                         case "/twitter":
                             await Task.Factory.StartNew(async () =>
                             {
-                                if(!String.IsNullOrEmpty(context.Request.Url.Query))
+                                if(String.IsNullOrEmpty(context.Request.Url.Query))
                                 {
                                     await WriteFile(context, "/var/www/html/twitter/tw.html");
                                 } else
