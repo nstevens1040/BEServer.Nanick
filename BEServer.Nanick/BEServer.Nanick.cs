@@ -938,7 +938,7 @@
             CookieCollection cookies = context.Request.Cookies;
             bool is_auth = context.Request.IsAuthenticated;
             bool handled = await HandleFileRequest(context);
-            if (!handled & context.Request.Url.Host.ToLower() == "ebay.nanick.org")
+            if (!handled & context.Request.Headers["Host"].ToString().ToLower() == "ebay.nanick.org")
             {
                 switch (abs_path)
                 {
