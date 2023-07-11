@@ -1128,8 +1128,8 @@
                         }
                         if (String.IsNullOrEmpty(endpoint))
                         {
-                            endpoint = $"{context.Request.Url.Scheme}://{context.Request.Url.Host}{context.Request.Url.AbsolutePath}";
-                            //endpoint = "https://ebay.nanick.org/dev";
+                            //endpoint = $"{context.Request.Url.Scheme}://{context.Request.Url.Host}{context.Request.Url.AbsolutePath}";
+                            endpoint = "https://ebay.nanick.org/dev";
                         }
                         IncrementalHash sha256 = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
                         sha256.AppendData(Encoding.UTF8.GetBytes(challengeCode));
