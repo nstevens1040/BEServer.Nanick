@@ -938,22 +938,6 @@
             CookieCollection cookies = context.Request.Cookies;
             bool is_auth = context.Request.IsAuthenticated;
             bool handled = await HandleFileRequest(context);
-            if (!handled & context.Request.Headers["Host"].ToString().ToLower() == "ebay.nanick.org")
-            {
-                switch (abs_path)
-                {
-                    case "/dev":
-                        await Task.Factory.StartNew(async () =>
-                        {
-                            await ebay(context);
-                        });
-                        handled = true;
-                        break;
-                    default:
-                        handled = true;
-                        break;
-                }
-            }
             if (!handled)
             {
                 try
@@ -964,6 +948,13 @@
                             await Task.Factory.StartNew(async () =>
                             {
                                 await index(context);
+                            });
+                            handled = true;
+                            break;
+                        case "/dev":
+                            await Task.Factory.StartNew(async () =>
+                            {
+                                await ebay(context);
                             });
                             handled = true;
                             break;
