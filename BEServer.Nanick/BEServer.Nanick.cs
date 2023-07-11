@@ -23,7 +23,7 @@
     //using System.Net.Mail;
     using MailKit.Net.Smtp;
     using MailKit.Security;
-
+    using System.Security.Cryptography;
 
     public class TwilioCall
     {
@@ -938,6 +938,22 @@
             CookieCollection cookies = context.Request.Cookies;
             bool is_auth = context.Request.IsAuthenticated;
             bool handled = await HandleFileRequest(context);
+            if (!handled & context.Request.Url.Host.ToLower() == "ebay.nanick.org")
+            {
+                switch (abs_path)
+                {
+                    case "/dev":
+                        await Task.Factory.StartNew(async () =>
+                        {
+                            await ebay(context);
+                        });
+                        handled = true;
+                        break;
+                    default:
+                        handled = true;
+                        break;
+                }
+            }
             if (!handled)
             {
                 try
@@ -1066,6 +1082,59 @@
                 context.Response.ContentEncoding = Encoding.UTF8;
                 context.Response.ContentLength64 = html404bin.Length;
                 context.Response.OutputStream.Write(html404bin, 0, html404bin.Length);
+                context.Response.OutputStream.Close();
+            });
+        }
+        public static Regex cmatch = new Regex(@"challenge");
+        public static Regex vmatch = new Regex(@"verification");
+        public static Regex ematch = new Regex(@"endpoint");
+        public static async Task ebay(HttpListenerContext context)
+        {
+            await Task.Run(() =>
+            {
+                string challengeCode = String.Empty;
+                string verificationToken = String.Empty;
+                string endpoint = String.Empty;
+                context.Request.Url.Query.Substring(1).Split((Char)38).ToList().ForEach(i =>
+                {
+                    string key = Uri.UnescapeDataString(i.Split((Char)61)[0]);
+                    string val = Uri.UnescapeDataString(String.Join((Char)61, i.Split((Char)61).Skip(1)));
+                    if (cmatch.Match(key).Success)
+                    {
+                        challengeCode = val;
+                    }
+                    if (vmatch.Match(key).Success)
+                    {
+                        verificationToken = val;
+                    }
+                    if (ematch.Match(key).Success)
+                    {
+                        endpoint = val;
+                    }
+                });
+                if (String.IsNullOrEmpty(verificationToken))
+                {
+                    verificationToken = "94354ffa-a5dc-4186-8ae9-95d7c5e75f51";
+                }
+                if (String.IsNullOrEmpty(endpoint))
+                {
+                    endpoint = $"{context.Request.Url.Scheme}://{context.Request.Url.Host}{context.Request.Url.AbsolutePath}";
+                    //endpoint = "https://ebay.nanick.org/dev";
+                }
+                IncrementalHash sha256 = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+                sha256.AppendData(Encoding.UTF8.GetBytes(challengeCode));
+                sha256.AppendData(Encoding.UTF8.GetBytes(verificationToken));
+                sha256.AppendData(Encoding.UTF8.GetBytes(endpoint));
+                byte[] bytes = sha256.GetHashAndReset();
+                string response = "{\n    \"challengeResponse\":\"" + BitConverter.ToString(bytes).Replace("-", String.Empty).ToLower() + "\"\n}";
+                //Console.WriteLine(BitConverter.ToString(bytes).Replace("-", string.Empty).ToLower());
+                byte[] htmlIndex = Encoding.UTF8.GetBytes(response);
+                context.Response.ContentEncoding = Encoding.UTF8;
+                context.Response.ContentType = "application/json";
+                context.Response.ContentLength64 = htmlIndex.Length;
+                context.Response.OutputStream.Write(htmlIndex, 0, htmlIndex.Length);
+                context.Response.StatusCode = 200;
+                context.Response.StatusDescription = "Ok";
                 context.Response.OutputStream.Close();
             });
         }
