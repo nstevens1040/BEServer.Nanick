@@ -929,6 +929,7 @@
         {
             string streambody = String.Empty;
             streambody = await GetRequestData(context);
+            string PnQ = context.Request.Url.PathAndQuery;
             bool is_authenticated = CheckAuth(context);
             this.Logger.SQLiteInsert(context,streambody);
             string abs_path = context.Request.Url == null ? String.Empty : context.Request.Url.AbsolutePath.ToLower();
@@ -950,6 +951,80 @@
                                 await index(context);
                             });
                             handled = true;
+                            break;
+                        case "/ytdl":
+                            context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+                            switch (method.ToLower())
+                            {
+                                case "get":
+                                    await Task.Factory.StartNew(() =>
+                                    {
+                                        //Console.Write(source_ip + " => " + method + " " + PnQ + (Char)10);
+                                        byte[] htmlIndex = Encoding.UTF8.GetBytes(File.ReadAllText("/home/nstevens/.TEMP/SCRIPTS/HTML/ytdl_2023-11-28.html"));
+                                        context.Response.ContentEncoding = Encoding.UTF8;
+                                        context.Response.ContentType = "text/html";
+                                        context.Response.ContentLength64 = htmlIndex.Length;
+                                        context.Response.OutputStream.Write(htmlIndex, 0, htmlIndex.Length);
+                                        context.Response.StatusCode = 200;
+                                        context.Response.StatusDescription = "Ok";
+                                        context.Response.OutputStream.Close();
+                                    });
+                                    break;
+                                case "post":
+                                    await Task.Factory.StartNew(() =>
+                                    {
+                                        string youtubeVideo = Uri.UnescapeDataString(streambody.Split((Char)61).Last().Trim());
+                                        string dataKey = Uri.UnescapeDataString(streambody.Split((Char)61).FirstOrDefault().Trim());
+                                        switch (dataKey)
+                                        {
+                                            case "ytlink":
+                                                string vidid = new Uri(youtubeVideo).Query.Substring(1).Split((Char)61).Last();
+                                                //Console.Write(source_ip + " => " + method + " " + PnQ + (Char)10);
+                                                using (Process p = new Process()
+                                                {
+                                                    StartInfo = new ProcessStartInfo()
+                                                    {
+                                                        FileName = "/usr/bin/python3",
+                                                        Arguments = " /home/nstevens/.TEMP/SCRIPTS/PY/getaudiouri.py \"" + youtubeVideo + "\"",
+                                                        UseShellExecute = false,
+                                                        RedirectStandardError = true,
+                                                        RedirectStandardOutput = true
+                                                    }
+                                                })
+                                                {
+                                                    p.Start();
+                                                    p.WaitForExit();
+                                                    string json_response = p.StandardOutput.ReadToEnd();
+                                                    //Console.Write(json_response + (Char)10);
+                                                    Byte[] html_byte = Encoding.UTF8.GetBytes(json_response);
+                                                    context.Response.ContentEncoding = Encoding.UTF8;
+                                                    context.Response.ContentType = "application/json";
+                                                    context.Response.ContentLength64 = html_byte.Length;
+                                                    context.Response.OutputStream.Write(html_byte, 0, html_byte.Length);
+                                                    context.Response.StatusCode = 200;
+                                                    context.Response.StatusDescription = "Ok";
+                                                    context.Response.OutputStream.Close();
+                                                }
+                                                break;
+                                            case "clength":
+                                                RetObject r = Execute.HttpRequest.Send(youtubeVideo, HttpMethod.Head);
+                                                Byte[] cLength = Encoding.UTF8.GetBytes(r.HttpResponseMessage.Content.Headers.ContentLength.ToString());
+                                                context.Response.ContentEncoding = Encoding.UTF8;
+                                                context.Response.ContentType = "text/plain";
+                                                context.Response.ContentLength64 = cLength.Length;
+                                                context.Response.OutputStream.Write(cLength, 0, cLength.Length);
+                                                context.Response.StatusCode = 200;
+                                                context.Response.StatusDescription = "Ok";
+                                                context.Response.OutputStream.Close();
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    });
+                                    break;
+                                default:
+                                    break;
+                            }
                             break;
                         case "/optilist":
                             await Task.Factory.StartNew(async () =>
