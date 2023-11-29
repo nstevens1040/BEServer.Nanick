@@ -939,6 +939,8 @@
             CookieCollection cookies = context.Request.Cookies;
             bool is_auth = context.Request.IsAuthenticated;
             bool handled = await HandleFileRequest(context);
+            context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+            context.Response.AddHeader("Access-Control-Expose-Headers", "true");
             if (!handled)
             {
                 try
