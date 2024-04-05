@@ -294,8 +294,8 @@
                     catch (Exception e)
                     {
                         string jerror = JsonConvert.SerializeObject(e);
-                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                        File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                        File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                        File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                         byte[] buffe = Encoding.UTF8.GetBytes(jerror);
                         context.Response.ContentEncoding = Encoding.UTF8;
                         context.Response.ContentType = "application/json";
@@ -343,8 +343,8 @@
             catch (Exception e)
             {
                 string jerror = JsonConvert.SerializeObject(e);
-                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
             }
             this.Listener = new HttpListener()
             {
@@ -405,7 +405,7 @@
         {
             bool handled = false;
             string abs_path = context.Request.Url == null ? String.Empty : context.Request.Url.AbsolutePath;
-            string RequestFile = $"{home_}/.TEMP/VAR/www" + Uri.UnescapeDataString(abs_path);
+            string RequestFile = $"{home_}/.temp/var/www" + Uri.UnescapeDataString(abs_path);
             if (File.Exists(RequestFile) & !abs_path.ToLower().Equals("/pixel.gif") & !abs_path.ToLower().Equals("/ebay.gif"))
             {
                 if (MimeTypes.GetMimeType(RequestFile).Contains("video") | MimeTypes.GetMimeType(RequestFile).Contains("mpegURL"))
@@ -428,7 +428,7 @@
         {
             if (!String.IsNullOrEmpty(twilio_call.RecordingUrl))
             {
-                string voicemail_file = $"{home_}/.TEMP/VOICEMAIL/{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
+                string voicemail_file = $"{home_}/.temp/voicemail/{GetUnixEpoch().ToString()}{twilio_call.Caller.Replace((Char)43, (Char)95)}.wav";
                 RetObject r = null;
                 try
                 {
@@ -462,8 +462,8 @@
                 catch (Exception e)
                 {
                     string jerror = JsonConvert.SerializeObject(e);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                 }
                 DateTime now = DateTime.Now;
                 while (!File.Exists(voicemail_file) | (DateTime.Now - now).TotalSeconds < 5) { }
@@ -498,8 +498,8 @@
                 catch (Exception e)
                 {
                     string jerror = JsonConvert.SerializeObject(e);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                 }
             }
             else
@@ -524,8 +524,8 @@
                 catch (Exception e)
                 {
                     string jerror = JsonConvert.SerializeObject(e);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                 }
             }
         }
@@ -546,14 +546,14 @@
                     addons_json = val;
                 }
             }
-            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"addons_json: {addons_json}\n");
+            File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"addons_json: {addons_json}\n");
             AddOns addons = JsonConvert.DeserializeObject<AddOns>(addons_json);
             string twilio_json = JsonConvert.SerializeObject(dict, Formatting.Indented);
-            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{twilio_json}\n");
+            File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"{twilio_json}\n");
             TwilioCall twilio_call = JsonConvert.DeserializeObject<TwilioCall>(twilio_json);
             twilio_call.AddOns = addons;
             string full_twilio_json = JsonConvert.SerializeObject(twilio_call, Formatting.Indented);
-            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"{full_twilio_json}\n");
+            File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"{full_twilio_json}\n");
             return twilio_call;
         }
         public static string FormatPhoneNumber(string caller)
@@ -571,22 +571,22 @@
         {
             await Task.Factory.StartNew(async () =>
             {
-                File.AppendAllText($"{home_}/Desktop/voicelog.txt", "running 'MissedCall' method\n");
+                File.AppendAllText($"{home_}/.temp/log/voicelog.txt", "running 'MissedCall' method\n");
                 string formatted = FormatPhoneNumber(twilio_call.Caller);
-                File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call from:{formatted}\ncall id:{caller_name}\n");
+                File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"call from:{formatted}\ncall id:{caller_name}\n");
                 if (include_recording)
                 {
                     DateTime now = DateTime.Now;
                     string subject = "New voicemail from " + formatted + " " + caller_name;
                     string body = "New voicemail from " + formatted + " " + caller_name + ".\nTo listen to this voicemail download the attached WAV file.\nThank you!";
-                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", "attempting to attach voicemail file\n");
-                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"subject: {subject}\nbody: {body}\n");
+                    File.AppendAllText($"{home_}/.temp/log/voicelog.txt", "attempting to attach voicemail file\n");
+                    File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"subject: {subject}\nbody: {body}\n");
                     await VoiceMailEmail(subject, body, twilio_call);
                 } else
                 {
                     string subject = "Missed call from " + formatted + " " + caller_name;
                     string body = "You've missed a call from " + formatted + " " + caller_name + ".";
-                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"sending email:\n    subject:{subject}\n    body:\n{body}\n");
+                    File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"sending email:\n    subject:{subject}\n    body:\n{body}\n");
                     await VoiceMailEmail(subject, body, twilio_call);
                 }
             });
@@ -597,7 +597,7 @@
             {
                 await Task.Factory.StartNew(async () =>
                 {
-                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"streambody: {streambody}\n");
+                    File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"streambody: {streambody}\n");
                     int timeOfDay = DateTime.Now.TimeOfDay.Hours;
                     string twilio_params = String.Empty;
                     if (String.IsNullOrEmpty(streambody))
@@ -618,8 +618,8 @@
                         catch (Exception e)
                         {
                             string jerror = JsonConvert.SerializeObject(e);
-                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                            File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                            File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                         }
                     } else
                     {
@@ -630,13 +630,13 @@
                         catch (Exception e)
                         {
                             string jerror = JsonConvert.SerializeObject(e);
-                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                            File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                            File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                         }
                     }
                     //= TwilioObject(twilio_params);
 
-                    File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"call status is {twilio_call.CallStatus}\n");
+                    File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"call status is {twilio_call.CallStatus}\n");
                     int request_number = 0;
                     if(!String.IsNullOrEmpty(twilio_call.CallToken))
                     {
@@ -676,7 +676,7 @@
                                     greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Evening.mp3";
                                     break;
                             }
-                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", $"selected greeting: {greeting_uri}\n");
+                            File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"selected greeting: {greeting_uri}\n");
                             string xml1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n     <Play>" + greeting_uri + "</Play>\n     <Record timeout=\"120\" playBeep=\"true\"></Record>\n    <Hangup></Hangup>\n</Response>\n";
                             byte[] twbuffe1 = Encoding.UTF8.GetBytes(xml1);
                             context.Response.ContentType = "text/xml";
@@ -689,7 +689,7 @@
                             await MissedCall(twilio_call, false, caller_name);
                             break;
                         case 2:
-                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"completed\"\n");
+                            File.AppendAllText($"{home_}/.temp/log/voicelog.txt", "fell into case \"completed\"\n");
                             string xml2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n    <Hangup></Hangup>\n</Response>";
                             byte[] twbuffe2 = Encoding.UTF8.GetBytes(xml2);
                             context.Response.ContentType = "text/xml";
@@ -702,7 +702,7 @@
                             await MissedCall(twilio_call, true, caller_name);
                             break;
                         case 3:
-                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"in-progress\"\n");
+                            File.AppendAllText($"{home_}/.temp/log/voicelog.txt", "fell into case \"in-progress\"\n");
                             string xml3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n    <Hangup></Hangup>\n</Response>";
                             byte[] twbuffe3 = Encoding.UTF8.GetBytes(xml3);
                             context.Response.ContentType = "text/xml";
@@ -715,7 +715,7 @@
                             await MissedCall(twilio_call, false, caller_name);
                             break;
                         default:
-                            File.AppendAllText($"{home_}/Desktop/voicelog.txt", "fell into case \"default\"\n");
+                            File.AppendAllText($"{home_}/.temp/log/voicelog.txt", "fell into case \"default\"\n");
                             break;
                     }
                 });
@@ -723,8 +723,8 @@
             catch (Exception e)
             {
                 string jerror = JsonConvert.SerializeObject(e);
-                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                 byte[] htmlIndex = Encoding.UTF8.GetBytes(jerror);
                 context.Response.ContentEncoding = Encoding.UTF8;
                 context.Response.ContentType = "application/json";
@@ -1139,8 +1139,8 @@
                 catch (Exception e)
                 {
                     string jerror = JsonConvert.SerializeObject(e);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                     byte[] htmlIndex = Encoding.UTF8.GetBytes(jerror);
                     context.Response.ContentEncoding = Encoding.UTF8;
                     context.Response.ContentType = "application/json";
@@ -1326,8 +1326,8 @@
                         catch (Exception e)
                         {
                             string jerror = JsonConvert.SerializeObject(e);
-                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                            File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                            File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                             byte[] htmlIndex = Encoding.UTF8.GetBytes(jerror);
                             context.Response.ContentEncoding = Encoding.UTF8;
                             context.Response.ContentType = "application/json";
@@ -1443,8 +1443,8 @@
                         catch (Exception e)
                         {
                             string jerror = JsonConvert.SerializeObject(e);
-                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                            File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                            File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                            File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                         }
                     }
                 }
@@ -1542,8 +1542,8 @@
                 catch (Exception e)
                 {
                     string jerror = JsonConvert.SerializeObject(e);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
-                    File.AppendAllText($"{home_}/Desktop/Exceptions.txt", jerror + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", DateTime.Now.ToString("u") + (Char)10);
+                    File.AppendAllText($"{home_}/.temp/log/Exceptions.txt", jerror + (Char)10);
                     if (e is HttpListenerException) return;
                 }
                 finally
