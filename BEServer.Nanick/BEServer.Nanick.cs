@@ -667,13 +667,13 @@
                             switch (timeOfDay)
                             {
                                 case < 12:
-                                    greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Morning.mp3";
+                                    greeting_uri = "https://storage.googleapis.com/voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5/Good%20Morning.mp3"
                                     break;
                                 case < 18:
-                                    greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Afternoon.mp3";
+                                    greeting_uri = "https://storage.googleapis.com/voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5/Good%20Afternoon.mp3";
                                     break;
                                 default:
-                                    greeting_uri = "https://voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5.s3.us-east-2.amazonaws.com/Good+Evening.mp3";
+                                    greeting_uri = "https://storage.googleapis.com/voicemail-7588ef66-0b3f-441d-a6fe-da82ccae75e5/Good%20Evening.mp3";
                                     break;
                             }
                             File.AppendAllText($"{home_}/.temp/log/voicelog.txt", $"selected greeting: {greeting_uri}\n");
